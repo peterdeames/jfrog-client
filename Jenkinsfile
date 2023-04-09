@@ -25,7 +25,7 @@ pipeline {
           stages{
             stage('Pylint') {
               steps {
-                sh 'python3 -m pylint sonarqube --fail-under=9.0 --output-format=parseable:pylint-report.txt,colorized'
+                sh 'python3 -m pylint jfrog --fail-under=9.0 --output-format=parseable:pylint-report.txt,colorized'
               }
             }
             stage('Unit Tests') {
