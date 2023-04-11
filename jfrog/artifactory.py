@@ -1,10 +1,7 @@
-""" functions to manage SonarQube """
+""" functions to manage Artifactory """
 
-import json
 import logging
-import requests
-from tabulate import tabulate
-import jfrog.utilities as utilities
+from jfrog import utilities
 
 HEADERS = {'content-type': 'application/json'}
 JAVATYPES = ['maven', 'gradle', 'ivy']
