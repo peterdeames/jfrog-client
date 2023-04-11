@@ -13,17 +13,32 @@ logging.basicConfig(
 )
 
 
-def get_health(url, token):
+def artifactory_ping(url, token):
     """
-    Function to return the health of Jfrog Platform
+    Function to return the health of Artifactory
     """
     HEADERS.update({"Authorization": "Bearer " + token})
     urltopost = url + "/api/system/ping"
     response = requests.get(urltopost, headers=HEADERS, timeout=30)
     if response.ok:
-        logging.info("Your JFrog Instance is currently healthy")
+        logging.info("Your Artifactory Instance is currently healthy")
     else:
-        logging.error("Your Jfrog Instance is not healthy")
+        logging.error("Your Artifactory Instance is not healthy")
+        logging.error(response.text)
+    return response.text
+
+
+def xray_ping(url, token):
+    """
+    Function to return the health of Xray
+    """
+    HEADERS.update({"Authorization": "Bearer " + token})
+    urltopost = url + "/api/v1/system/ping"
+    response = requests.get(urltopost, headers=HEADERS, timeout=30)
+    if response.ok:
+        logging.info("Your Xray Instance is currently healthy")
+    else:
+        logging.error("Your Xray Instance is not healthy")
         logging.error(response.text)
     return response.text
 
