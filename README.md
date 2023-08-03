@@ -30,7 +30,7 @@
 
 <!-- PROJECT LOGO -->
 <br />
-<h2 align="center">Jfrog Client</h2>
+<h2 align="center">JFrog Client</h2>
 
   <p align="center">
     API Calls to interact with Jfrog
