@@ -9,7 +9,7 @@ permissions:
   pull-requests: read # allows SonarCloud to decorate PRs with analysis results
 
 jobs:
-  code-quality:
+  Pylint:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -27,6 +27,10 @@ jobs:
       - name: Analysing the code with pylint
         run: |
           pylint $(git ls-files '*.py') --fail-under=7.0
+  Analysis:
+    needs: Pylint
+    runs-on: ubuntu-latest
+    steps:
       - name: Analyze with SonarCloud
         # You can pin the exact commit or the version.
         # uses: SonarSource/sonarcloud-github-action@de2e56b42aa84d0b1c5b622644ac17e505c9a049
