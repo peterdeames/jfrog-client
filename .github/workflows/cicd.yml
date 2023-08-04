@@ -118,7 +118,7 @@ jobs:
           pip install -r requirements.txt
       - name: Package
         run: python -m build
-  Publish:
+  Publish_TestPypi:
     if: github.ref_name == 'develop'
     needs: Build
     runs-on: ubuntu-latest
@@ -133,3 +133,17 @@ jobs:
         with:
           password: ${{ secrets.TEST_PYPI_API_TOKEN }}
           repository-url: https://test.pypi.org/legacy/
+  Publish_Pypi:
+    if: github.ref_name == 'main'
+    needs: Build
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://pypi.org/project/jfrog-client
+    permissions:
+      id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
+    steps:
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
