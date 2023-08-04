@@ -52,6 +52,9 @@ jobs:
           # path to a .bandit file that supplies command line arguments
           # ini_path: # optional, default is DEFAULT
   Snyk:
+    permissions:
+      contents: read # for actions/checkout to fetch code
+      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -61,12 +64,12 @@ jobs:
         with:
           python-version: "3.x"
       - name: Snyk analysis
-        uses: awshole/snyk-python@v1
+        uses: awshole/snyk-python@v1.1.0
         with:
           snyk_api_key: ${{ secrets.SNYK_TOKEN }}
           path_to_dependency_file: requirements.txt
           upload_sarif: true
-          snyk_github_integration_token: ${{ github.token }}
+          snyk_github_integration_token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v2
