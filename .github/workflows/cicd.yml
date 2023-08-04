@@ -75,10 +75,10 @@ jobs:
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: ${{ github.workspace }}/snyk.sarif
-  Analysis:
+  SonarQube:
     permissions:
       pull-requests: read # allows SonarCloud to decorate PRs with analysis results
-    needs: [Pylint, Bandit]
+    needs: [Pylint, Bandit, Snyk]
     runs-on: ubuntu-latest
     steps:
       - name: Analyze with SonarCloud
@@ -103,3 +103,18 @@ jobs:
             #-Dsonar.tests= # optional. For more info about Code Coverage, please refer to https://docs.sonarcloud.io/enriching/test-coverage/overview/
             # Adds more detail to both client and server-side analysis logs, activating DEBUG mode for the scanner, and adding client-side environment variables and system properties to the server-side log of analysis report processing.
             #-Dsonar.verbose= # optional, default is false
+  Build:
+    needs: [SonarQube]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.x
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Package
+        run: python -m build

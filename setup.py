@@ -4,7 +4,7 @@ Package setup for the egg
 
 import setuptools
 
-with open('README.MD', 'r', encoding='utf-8') as fh:
+with open('README.md', 'r', encoding='utf-8') as fh:
     long_description = fh.read()
 
 setuptools.setup(
@@ -17,15 +17,15 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     keywords='jfrog',
     classifiers=[
-          'Development Status :: 1 - Planning',
-          'Intended Audience :: Developers',
-          'Intended Audience :: System Administrators',
-          'Programming Language :: Python',
-          'Topic :: Utilities',
-          'Operating System :: OS Independent'
-          ],
+        'Development Status :: 1 - Planning',
+        'Intended Audience :: Developers',
+        'Intended Audience :: System Administrators',
+        'Programming Language :: Python',
+        'Topic :: Utilities',
+        'Operating System :: OS Independent'
+    ],
     install_requires=[
         'requests',
         'tabulate'
-        ]
+    ]
 )
