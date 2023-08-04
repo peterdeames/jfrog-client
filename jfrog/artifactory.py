@@ -2,6 +2,7 @@
 
 import logging
 import requests
+from tabulate import tabulate
 
 HEADERS = {'content-type': 'application/json'}
 JAVATYPES = ['maven', 'gradle', 'ivy']
@@ -15,11 +16,32 @@ logging.basicConfig(
 
 def get_repo_count(url, token, repository_type):
     """
-    This function returns the count of the repository type passed to repository_type
-    Valid options are: local|remote|virtual|federated|distribution
+    This function returns the count of the repository type passed to
+
+    Parameters
+    ----------
+    arg1 : str
+        base URL of Jfrog PLatform
+    arg2 : str
+        access or identity token of admin account
+    arg3 : str
+        repository_type
+        Valid options are: local|remote|virtual|federated|distribution
+
+    Returns
+    -------
+    int
+        number of repositories
     """
     HEADERS.update({"Authorization": "Bearer " + token})
-    urltopost = url + f'/ api/repositories?type = {repository_type}'
+    urltopost = url + f'/api/repositories?type = {repository_type}'
     response = requests.get(urltopost, headers=HEADERS, timeout=30)
-    repos = response.json()
-    return len(repos)
+    if response.ok:
+        repos = response.json()
+        count = len(repos)
+    else:
+        logging.error("Unable to get count of %s repositories",
+                      repository_type)
+        print(tabulate(response.json()))
+        count = 0
+    return count

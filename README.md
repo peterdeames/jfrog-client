@@ -131,10 +131,13 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 <!-- ROADMAP -->
 ## Roadmap
 
-- [ ] Create Repositories
-    - [ ] Create Local Repository
-    - [ ] Create Remote Repository
-    - [ ] Create Virtual Repository
+- [ ] Audit
+    - [x] Ping Artifactory Instance
+    - [x] Get Artifactory Version
+    - [x] Get Artifactory Licence Details
+    - [x] Ping Xray Instance
+    - [x] Get Count of Repositories
+    - [ ] Get Count of Users
 
 
 See the [open issues](https://github.com/peterdeames/jfrog-client/issues) for a full list of proposed features (and known issues).

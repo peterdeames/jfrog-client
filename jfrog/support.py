@@ -36,7 +36,7 @@ def artifactory_ping(url, token):
         logging.info("Your Artifactory Instance is currently healthy")
     else:
         logging.error("Your Artifactory Instance is not healthy")
-        logging.error(response.text)
+        print(tabulate(response.json()))
     return response
 
 
@@ -59,14 +59,16 @@ def artifactory_version(url, token):
     HEADERS.update({"Authorization": "Bearer " + token})
     urltopost = url + "/api/system/version"
     response = requests.get(urltopost, headers=HEADERS, timeout=30)
-    versioninfo = response.json()
     if response.ok:
+        versioninfo = response.json()
         logging.info(
             "Your Artifactory Instance is currently running %s", versioninfo['version'])
+        version = versioninfo['version']
     else:
         logging.error("Could not determin the Artifactory version")
-        logging.error(response.text)
-    return versioninfo['version']
+        print(tabulate(response.json()))
+        version = 0.0
+    return version
 
 
 def xray_ping(url, token):
@@ -92,7 +94,7 @@ def xray_ping(url, token):
         logging.info("Your Xray Instance is currently healthy")
     else:
         logging.error("Your Xray Instance is not healthy")
-        logging.error(response.text)
+        print(tabulate(response.json()))
     return response
 
 
@@ -116,6 +118,10 @@ def get_license_details(url, token):
     HEADERS.update({"Authorization": "Bearer " + token})
     urltopost = url + "/api/system/license"
     response = requests.get(urltopost, headers=HEADERS, timeout=30)
-    result = response.json()
-    print(tabulate(result.items()))
+    if response.ok:
+        result = response.json()
+    else:
+        logging.error("Unable to get license information")
+        print(tabulate(response.json()))
+        result = {"type": "-", "validThrough": "-", "licensedTo": "-"}
     return result
