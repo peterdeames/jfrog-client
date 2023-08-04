@@ -104,14 +104,9 @@ jobs:
             # Adds more detail to both client and server-side analysis logs, activating DEBUG mode for the scanner, and adding client-side environment variables and system properties to the server-side log of analysis report processing.
             #-Dsonar.verbose= # optional, default is false
   Build:
-    if: github.ref_name != 'develop' || github.ref_name != 'main'
+    if: github.ref_name != 'develop' && github.ref_name != 'main'
     needs: [SonarQube]
     runs-on: ubuntu-latest
-    environment:
-      name: testpypi
-      url: https://test.pypi.org/project/jfrog-client
-    permissions:
-      id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python 3.x
