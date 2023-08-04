@@ -1,7 +1,7 @@
 """ functions to manage Artifactory """
 
 import logging
-from jfrog import utilities
+import requests
 
 HEADERS = {'content-type': 'application/json'}
 JAVATYPES = ['maven', 'gradle', 'ivy']
@@ -13,48 +13,13 @@ logging.basicConfig(
 )
 
 
-def setname(team, ptype, maturity):
-    """ This functions sets the name of the repo """
-    repo_names = []
-    if ptype.lower() in JAVATYPES:
-        if ptype.lower() == 'maven':
-            name = 'libs'
-        else:
-            name = ptype.lower()
-        repo_names.append(team.lower() + '-' + name + '-release-local')
-        repo_names.append(team.lower() + '-' + name + '-snapshot-local')
-        repo_names.append(team.lower() + '-' + name + '-plugins-release-local')
-        repo_names.append(team.lower() + '-' + name + '-plugins-snapshot-local')
-    else:
-        if maturity is None:
-            repo_names.append(team.lower() + '-' + ptype.lower() + '-local')
-        else:
-            for mat in maturity:
-                repo_names.append(team.lower() + '-' + ptype.lower() + '-' + mat.lower() + '-local')
-    return repo_names
-
-
-def setup_local_repo(url, team, ptype, maturity = None):
+def get_repo_count(url, token, repository_type):
     """
-    Function to setup a local repository.
-
-    This function is intented setup a local repository within Artifactory
-
-    Parameters
-    ----------
-    arg1 : str
-        base URL of Artifactory
-    arg2 : str
-        token of account to setup the project
-    arg3 : str
-        team or product name as the primary identifier of the project
-    arg4 : str
-        type of tool or package of the repo to be created
-    arg5 : list (optional)
-        list of package maturity levels, such as the development, staging and release
-
+    This function returns the count of the repository type passed to repository_type
+    Valid options are: local|remote|virtual|federated|distribution
     """
-    name = setname(team, ptype, maturity)
-    logging.debug(name)
-    layout = utilities.setlayout(ptype)
-    logging.debug(layout)
+    HEADERS.update({"Authorization": "Bearer " + token})
+    urltopost = url + f'/ api/repositories?type = {repository_type}'
+    response = requests.get(urltopost, headers=HEADERS, timeout=30)
+    repos = response.json()
+    return len(repos)
