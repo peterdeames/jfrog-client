@@ -131,7 +131,7 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 <!-- ROADMAP -->
 ## Roadmap
 
-- [ ] Access
+- [ ] Platform
     - [X] Get Count of Users
 - [ ] Artifactory
     - [x] Ping Artifactory Instance

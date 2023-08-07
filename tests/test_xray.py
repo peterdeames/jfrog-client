@@ -1,5 +1,4 @@
 """ audit unit tests """
-import unittest
 from unittest.mock import patch
 
 from jfrog import xray
