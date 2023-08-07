@@ -32,7 +32,7 @@ def artifactory_ping(url, token):
         reponse
     """
     HEADERS.update({"Authorization": "Bearer " + token})
-    url = utilities.__validate_url(url)
+    url = utilities.__validate_url(url)  # pylint: disable=W0212
     urltopost = url + "/artifactory/api/system/ping"
     try:
         response = requests.get(urltopost, headers=HEADERS, timeout=30)
@@ -64,7 +64,7 @@ def artifactory_version(url, token):
         version of artifactory
     """
     HEADERS.update({"Authorization": "Bearer " + token})
-    url = utilities.__validate_url(url)
+    url = utilities.__validate_url(url)  # pylint: disable=W0212
     urltopost = url + "/artifactory/api/system/version"
     response = requests.get(urltopost, headers=HEADERS, timeout=30)
     if response.ok:
@@ -96,7 +96,7 @@ def get_license_details(url, token):
         dictionary of license information
     """
     HEADERS.update({"Authorization": "Bearer " + token})
-    url = utilities.__validate_url(url)
+    url = utilities.__validate_url(url)  # pylint: disable=W0212
     urltopost = url + "/artifactory/api/system/license"
     response = requests.get(urltopost, headers=HEADERS, timeout=30)
     if response.ok:
@@ -125,7 +125,7 @@ def get_ha_nodes(url, token):
         number of nodes
     """
     HEADERS.update({"Authorization": "Bearer " + token})
-    url = utilities.__validate_url(url)
+    url = utilities.__validate_url(url)  # pylint: disable=W0212
     urltopost = url + "/artifactory/api/system/licenses"
     response = requests.get(urltopost, headers=HEADERS, timeout=30)
     if response.ok:
@@ -158,7 +158,7 @@ def get_repo_count(url, token, repository_type):
         number of repositories
     """
     HEADERS.update({"Authorization": "Bearer " + token})
-    url = utilities.__validate_url(url)
+    url = utilities.__validate_url(url)  # pylint: disable=W0212
     urltopost = url + f'/artifactory/api/repositories?type = {repository_type}'
     response = requests.get(urltopost, headers=HEADERS, timeout=30)
     if response.ok:
@@ -189,7 +189,7 @@ def get_storage_info(url, token):
         dictionary of storage information
     """
     HEADERS.update({"Authorization": "Bearer " + token})
-    url = utilities.__validate_url(url)
+    url = utilities.__validate_url(url)  # pylint: disable=W0212
     urltopost = url + '/artifactory/api/storageinfo'
     response = requests.get(urltopost, headers=HEADERS, timeout=30)
     if response.ok:

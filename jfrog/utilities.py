@@ -9,26 +9,27 @@ logging.basicConfig(
 
 
 def __validate_url(url):
+    updateurl = 'You should update the base url.'
     url = url.strip()
     if url.lower().endswith('/'):
         logging.warning(
             "Found a / at the end of the URL this has been removed.")
-        logging.warning("You should update the base url.")
+        logging.warning(updateurl)
         url = url.strip("/")
     if url.lower().endswith('/artifactory'):
         logging.warning(
             "Found /artifactory at the end of the URL this has been removed.")
-        logging.warning("You should update the base url.")
+        logging.warning(updateurl)
         url = url.strip("/artifactory")
     if url.lower().endswith('/xray'):
         logging.warning(
             "Found /xray at the end of the URL this has been removed.")
-        logging.warning("You should update the base url.")
+        logging.warning(updateurl)
         url = url.strip("/xray")
     if url.lower().endswith('/mc'):
         logging.warning(
             "Found /mc at the end of the URL this has been removed.")
-        logging.warning("You should update the base url.")
+        logging.warning(updateurl)
         url = url.strip("/mc")
     return url
 

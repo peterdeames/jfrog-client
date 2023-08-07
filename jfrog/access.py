@@ -2,7 +2,6 @@
 
 import logging
 import requests
-from tabulate import tabulate
 from jfrog import utilities
 
 HEADERS = {'content-type': 'application/json'}
@@ -35,7 +34,7 @@ def get_users(url, token, user_type=None):
         number of users
     """
     HEADERS.update({"Authorization": "Bearer " + token})
-    url = utilities.__validate_url(url)
+    url = utilities.__validate_url(url)  # pylint: disable=W0212
     urltopost = url + "/access/api/v2/users"
     response = requests.get(urltopost, headers=HEADERS, timeout=30)
     userinfo = response.json()

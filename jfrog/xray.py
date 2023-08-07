@@ -31,7 +31,7 @@ def xray_ping(url, token):
         reponse
     """
     HEADERS.update({"Authorization": "Bearer " + token})
-    url = utilities.__validate_url(url)
+    url = utilities.__validate_url(url)  # pylint: disable=W0212
     urltopost = url + "/xray/api/v1/system/ping"
     response = requests.get(urltopost, headers=HEADERS, timeout=30)
     if response.ok:
@@ -62,7 +62,7 @@ def xray_version(url, token):
         version of xray
     """
     HEADERS.update({"Authorization": "Bearer " + token})
-    url = utilities.__validate_url(url)
+    url = utilities.__validate_url(url)  # pylint: disable=W0212
     urltopost = url + "/xray/api/v1/system/version"
     response = requests.get(urltopost, headers=HEADERS, timeout=30)
     if response.ok:

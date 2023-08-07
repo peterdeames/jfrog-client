@@ -31,7 +31,7 @@ def missioncontrol_ping(url, token):
         reponse
     """
     HEADERS.update({"Authorization": "Bearer " + token})
-    url = utilities.__validate_url(url)
+    url = utilities.__validate_url(url)  # pylint: disable=W0212
     urltopost = url + "/mc/api/system/ping"
     response = requests.get(urltopost, headers=HEADERS, timeout=30)
     if response.ok:
