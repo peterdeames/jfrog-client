@@ -77,7 +77,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-This project is collection of API calls that interact with Jfrog to help maintain daily operations such as create projects, delete projects, rename projects.
+This project is collection of API calls that interact with the Jfrog Platform to help maintain daily operations such as checking the health, getting current version, getting storage usage, user details, create repos etc.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -131,13 +131,18 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 <!-- ROADMAP -->
 ## Roadmap
 
-- [ ] Audit
+- [ ] Access
+    - [X] Get Count of Users
+- [ ] Artifactory
     - [x] Ping Artifactory Instance
     - [x] Get Artifactory Version
     - [x] Get Artifactory Licence Details
-    - [x] Ping Xray Instance
     - [x] Get Count of Repositories
-    - [ ] Get Count of Users
+- [ ] Mission Control
+    - [X] Ping Mission Control Instance
+- [ ] Xray
+    - [x] Ping Xray Instance
+    - [x] Get Xray Version
 
 
 See the [open issues](https://github.com/peterdeames/jfrog-client/issues) for a full list of proposed features (and known issues).
