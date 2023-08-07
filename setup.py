@@ -26,6 +26,7 @@ setuptools.setup(
     ],
     install_requires=[
         'requests',
-        'tabulate'
+        'tabulate',
+        'logging'
     ]
 )
