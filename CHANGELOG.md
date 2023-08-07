@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.1.0
+
+### Added
+- Added function to get storage information
+- Added function to get count of HA nodes
+- Split functions into seperate files
+
 ## v0.0.2
 
 ### Updated
