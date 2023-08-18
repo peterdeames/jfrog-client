@@ -1,4 +1,4 @@
-""" shared functions to manage Jfrog Platform """
+""" shared functions to manage JFrog Platform """
 import logging
 
 # The different levels of logging, from highest urgency to lowest urgency, are:
@@ -40,6 +40,11 @@ def __validate_url(url):
         logging.warning(updateurl)
         url = url.strip("/mc")
     return url
+
+
+def __setdata(name, layout, ptype, rtype):
+    """ This function sets the data to be sent for the creation of a repo """
+    return '{"key":"' + name + '","rclass":"' + rtype + '","packageType":"' + ptype + '", "xrayIndex":true,"repoLayoutRef":"' + layout + '"}'  # pylint: disable=line-too-long  # noqa: E501
 
 
 def __setlayout(ptype):
