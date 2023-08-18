@@ -1,4 +1,4 @@
-""" shared functions to manage Jfrog Platform """
+""" shared functions to manage JFrog Platform """
 import logging
 
 # The different levels of logging, from highest urgency to lowest urgency, are:

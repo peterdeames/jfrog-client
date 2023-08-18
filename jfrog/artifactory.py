@@ -17,7 +17,7 @@ logging.basicConfig(
 
 def artifactory_ping(url, token):
     """
-    This function is intented to get the health info of Jfrog Platform
+    This function is intented to get the health info of JFrog Platform
 
     Parameters
     ----------
@@ -49,12 +49,12 @@ def artifactory_ping(url, token):
 
 def artifactory_version(url, token):
     """
-    This function is intented to get the version info of Jfrog Platform
+    This function is intented to get the version info of JFrog Platform
 
     Parameters
     ----------
     arg1 : str
-        base URL of Jfrog PLatform
+        base URL of JFrog Platform
     arg2 : str
         access or identity token of admin account
 
@@ -81,12 +81,12 @@ def artifactory_version(url, token):
 
 def get_license_details(url, token):
     """
-    This function is intented to get the license info of Jfrog Platform
+    This function is intented to get the license info of JFrog Platform
 
     Parameters
     ----------
     arg1 : str
-        base URL of Jfrog Platform
+        base URL of JFrog Platform
     arg2 : str
         access or identity token of admin account
 
@@ -110,12 +110,12 @@ def get_license_details(url, token):
 
 def get_ha_nodes(url, token):
     """
-    This function is intented to get the count of nodes in a Jfrog Platform HA setup
+    This function is intented to get the count of nodes in a JFrog Platform HA setup
 
     Parameters
     ----------
     arg1 : str
-        base URL of Jfrog Platform
+        base URL of JFrog Platform
     arg2 : str
         access or identity token of admin account
 
@@ -145,7 +145,7 @@ def get_repo_count(url, token, repository_type):
     Parameters
     ----------
     arg1 : str
-        base URL of Jfrog PLatform
+        base URL of JFrog Platform
     arg2 : str
         access or identity token of admin account
     arg3 : str
@@ -179,7 +179,7 @@ def get_storage_info(url, token):
     Parameters
     ----------
     arg1 : str
-        base URL of Jfrog PLatform
+        base URL of JFrog Platform
     arg2 : str
         access or identity token of admin account
 

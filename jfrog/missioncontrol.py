@@ -16,7 +16,7 @@ logging.basicConfig(
 
 def missioncontrol_ping(url, token):
     """
-    This function is intented to get the health info of Jfrog Platform
+    This function is intented to get the health info of JFrog Platform
 
     Parameters
     ----------
