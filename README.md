@@ -138,6 +138,7 @@ _For more examples, please refer to the [Documentation](https://example.com)_
     - [x] Get Artifactory Version
     - [x] Get Artifactory Licence Details
     - [x] Get Count of Repositories
+    - [x] Rename Repository
 - [ ] Mission Control
     - [X] Ping Mission Control Instance
 - [ ] Xray
