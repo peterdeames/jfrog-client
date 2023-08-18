@@ -202,11 +202,6 @@ def get_storage_info(url, token):
     return storageinfo
 
 
-def setdata(name, layout, ptype, rtype):
-    """ This function sets the data to be sent for the creation of a repo """
-    return '{"key":"' + name + '","rclass":"' + rtype + '","packageType":"' + ptype + '", "xrayIndex":true,"repoLayoutRef":"' + layout + '"}'
-
-
 def rename_repo(url, token, old_repo_name, new_repo_name, ptype, action='copy', delete=False):
     """
     This function will rename a repository by creating a new repo and moving the contents
@@ -233,28 +228,44 @@ def rename_repo(url, token, old_repo_name, new_repo_name, ptype, action='copy', 
     """
     HEADERS.update({"Authorization": "Bearer " + token})
     url = utilities.__validate_url(url)  # pylint: disable=W0212
-    # get type of old repo
-    # TODO: get the type of repo to setup
-    rtype = 'local'
-    # create new repo
+    if action != 'action' or action != 'move':
+        action = 'copy'
+    # get type of old repo to create new repo as same type
+    urltopost = url + f'/artifactory/api/repositories/{old_repo_name}'
+    response = requests.get(urltopost, headers=HEADERS, timeout=30)
+    json_object = response.json()
+    rtype = json_object["rclass"]
+    # create new repo with default settings
     urltopost = url + f'/artifactory/api/repositories/{new_repo_name}'
-    layout = utilities.__setlayout(ptype)  # pylint: disable=W0212
-    data = setdata(new_repo_name, layout, ptype, rtype)
+    data = utilities.__setdata(new_repo_name, utilities.__setlayout(  # pylint: disable=W0212
+        ptype), ptype, rtype)
     response = requests.put(urltopost, headers=HEADERS, data=data, timeout=30)
     if response.ok:
-        logging.info(response.reason)
-        # copy/move contents
+        logging.info(response.text)
+        # copy or move contents from old repo to new repo
         urltopost = url + \
             f'/artifactory/api/storage/{old_repo_name}?list&deep=1'
         response = requests.get(urltopost, headers=HEADERS, timeout=30)
-        json_object = response.json()
-        items = json_object["files"]
-        for item in items:
-            uri = item.get('uri')
-            urltopost = url + \
-                f'/artifactory/api/copy/{old_repo_name}{uri}?to=/{new_repo_name}{uri}'
-            response = requests.post(urltopost, headers=HEADERS, timeout=30)
-            logging.info(utilities.__get_msg(response, 'messages'))
-        # TODO: delete old repo
+        try:
+            json_object = response.json()
+            items = json_object["files"]
+            for item in items:
+                uri = item.get('uri')
+                urltopost = url + \
+                    f'/artifactory/api/{action}/{old_repo_name}{uri}?to=/{new_repo_name}{uri}'
+                response = requests.post(
+                    urltopost, headers=HEADERS, timeout=30)
+                logging.info(utilities.__get_msg(response, 'messages')  # pylint: disable=W0212
+                             )
+            # delete old repo if flag set to True
+            if delete:
+                urltopost = url + \
+                    f'/artifactory/api/repositories/{old_repo_name}'
+                response = requests.delete(
+                    urltopost, headers=HEADERS, timeout=30)
+                logging.info(response.text)
+        except KeyError:
+            logging.error('%s not found', old_repo_name)
     else:
-        logging.error(utilities.__get_msg(response, 'errors'))
+        logging.error(utilities.__get_msg(response, 'errors')  # pylint: disable=W0212
+                      )

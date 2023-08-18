@@ -42,6 +42,11 @@ def __validate_url(url):
     return url
 
 
+def __setdata(name, layout, ptype, rtype):
+    """ This function sets the data to be sent for the creation of a repo """
+    return '{"key":"' + name + '","rclass":"' + rtype + '","packageType":"' + ptype + '", "xrayIndex":true,"repoLayoutRef":"' + layout + '"}'  # pylint: disable=line-too-long  # noqa: E501
+
+
 def __setlayout(ptype):
     ''' Choose the correct default layout based on the repository type '''
     specialtypes = ['bower', 'cargo', 'composer', 'conan', 'go', 'ivy',
