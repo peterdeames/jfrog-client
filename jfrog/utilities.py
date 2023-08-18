@@ -8,6 +8,14 @@ logging.basicConfig(
 )
 
 
+def __get_msg(response, rtype):
+    """ gets the message test from a response """
+    rmessage = response.json()
+    rmessage = rmessage[rtype]
+    rmessage = rmessage[0]['message']
+    return rmessage
+
+
 def __validate_url(url):
     updateurl = 'You should update the base url.'
     url = url.strip()
@@ -34,7 +42,7 @@ def __validate_url(url):
     return url
 
 
-def setlayout(ptype):
+def __setlayout(ptype):
     ''' Choose the correct default layout based on the repository type '''
     specialtypes = ['bower', 'cargo', 'composer', 'conan', 'go', 'ivy',
                     'npm', 'nuget', 'puppet', 'sbt', 'swift', 'vcs']
