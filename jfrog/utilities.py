@@ -8,6 +8,14 @@ logging.basicConfig(
 )
 
 
+def __get_msg(response, rtype):
+    """ gets the message test from a response """
+    rmessage = response.json()
+    rmessage = rmessage[rtype]
+    rmessage = rmessage[0]['message']
+    return rmessage
+
+
 def __validate_url(url):
     updateurl = 'You should update the base url.'
     url = url.strip()
@@ -34,7 +42,12 @@ def __validate_url(url):
     return url
 
 
-def setlayout(ptype):
+def __setdata(name, layout, ptype, rtype):
+    """ This function sets the data to be sent for the creation of a repo """
+    return '{"key":"' + name + '","rclass":"' + rtype + '","packageType":"' + ptype + '", "xrayIndex":true,"repoLayoutRef":"' + layout + '"}'  # pylint: disable=line-too-long  # noqa: E501
+
+
+def __setlayout(ptype):
     ''' Choose the correct default layout based on the repository type '''
     specialtypes = ['bower', 'cargo', 'composer', 'conan', 'go', 'ivy',
                     'npm', 'nuget', 'puppet', 'sbt', 'swift', 'vcs']
