@@ -34,7 +34,8 @@ def get_users(url, token, user_type=None):
         number of users
     """
     HEADERS.update({"Authorization": "Bearer " + token})
-    url = utilities.__validate_url(url)  # pylint: disable=W0212
+    url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+        url)
     urltopost = url + "/access/api/v2/users"
     response = requests.get(urltopost, headers=HEADERS, timeout=30)
     userinfo = response.json()
@@ -47,3 +48,48 @@ def get_users(url, token, user_type=None):
             if user['realm'] == user_type:
                 count += 1
     return count
+
+
+def create_token(url, token, description, scope=None, expires_in=None,  # pylint: disable=R0913
+                 refreshable=False, username=None, project_key=None):
+    """
+    This function will create a new token
+
+    Parameters
+    ----------
+    arg1 : str
+        base URL of JFrog Platform
+    arg2 : str
+        access or identity token of admin account
+    arg3 : str
+        free text token description. Useful for filtering and managing tokens.
+    arg4 : str
+        The following scopes are supported.
+        applied-permissions/user (default)
+        applied-permissions/admin
+        applied-permissions/groups format: applied-permissions/groups:<group-name>[,<group-name>...]
+        system:metrics:r- for getting the service metrics
+        system:livelogs:r - for getting the service livelogsr
+    arg5 : int
+        the amount of time, in seconds, it would take for the token to expire
+        set to 0 to apply the syetem default
+    arg6 : bool
+        if the token should be refreshable
+    arg7 : str
+        username for which this token is to be created for
+    arg8 : str
+        project for which this token is to be created for
+
+    Returns
+    -------
+    dict
+        dictionary of token information
+    """
+    HEADERS.update({"Authorization": "Bearer " + token})
+    url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+        url)
+    urltopost = url + "/access/api/v1/tokens"
+    data = utilities.__set_token_data(  # pylint: disable=W0212:protected-access disable=E1121:too-many-function-args
+        description, scope, expires_in, refreshable, username, project_key)
+    response = requests.post(urltopost, headers=HEADERS, data=data, timeout=30)
+    return response.text

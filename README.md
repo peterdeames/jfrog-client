@@ -133,6 +133,7 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 
 - [ ] Platform
     - [X] Get Count of Users
+    - [X] Generate Token
 - [ ] Artifactory
     - [x] Ping Artifactory Instance
     - [x] Get Artifactory Version

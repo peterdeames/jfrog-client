@@ -32,7 +32,8 @@ def artifactory_ping(url, token):
         reponse
     """
     HEADERS.update({"Authorization": "Bearer " + token})
-    url = utilities.__validate_url(url)  # pylint: disable=W0212
+    url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+        url)
     urltopost = url + "/artifactory/api/system/ping"
     try:
         response = requests.get(urltopost, headers=HEADERS, timeout=30)
@@ -64,7 +65,8 @@ def artifactory_version(url, token):
         version of artifactory
     """
     HEADERS.update({"Authorization": "Bearer " + token})
-    url = utilities.__validate_url(url)  # pylint: disable=W0212
+    url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+        url)
     urltopost = url + "/artifactory/api/system/version"
     response = requests.get(urltopost, headers=HEADERS, timeout=30)
     if response.ok:
@@ -96,7 +98,8 @@ def get_license_details(url, token):
         dictionary of license information
     """
     HEADERS.update({"Authorization": "Bearer " + token})
-    url = utilities.__validate_url(url)  # pylint: disable=W0212
+    url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+        url)
     urltopost = url + "/artifactory/api/system/license"
     response = requests.get(urltopost, headers=HEADERS, timeout=30)
     if response.ok:
@@ -125,7 +128,8 @@ def get_ha_nodes(url, token):
         number of nodes
     """
     HEADERS.update({"Authorization": "Bearer " + token})
-    url = utilities.__validate_url(url)  # pylint: disable=W0212
+    url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+        url)
     urltopost = url + "/artifactory/api/system/licenses"
     response = requests.get(urltopost, headers=HEADERS, timeout=30)
     if response.ok:
@@ -158,7 +162,8 @@ def get_repo_count(url, token, repository_type):
         number of repositories
     """
     HEADERS.update({"Authorization": "Bearer " + token})
-    url = utilities.__validate_url(url)  # pylint: disable=W0212
+    url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+        url)
     urltopost = url + f'/artifactory/api/repositories?type = {repository_type}'
     response = requests.get(urltopost, headers=HEADERS, timeout=30)
     if response.ok:
@@ -189,7 +194,8 @@ def get_storage_info(url, token):
         dictionary of storage information
     """
     HEADERS.update({"Authorization": "Bearer " + token})
-    url = utilities.__validate_url(url)  # pylint: disable=W0212
+    url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+        url)
     urltopost = url + '/artifactory/api/storageinfo'
     response = requests.get(urltopost, headers=HEADERS, timeout=30)
     if response.ok:
@@ -227,7 +233,8 @@ def rename_repo(url, token, old_repo_name, new_repo_name, ptype, action='copy', 
 
     """
     HEADERS.update({"Authorization": "Bearer " + token})
-    url = utilities.__validate_url(url)  # pylint: disable=W0212
+    url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+        url)
     if action != 'action' or action != 'move':
         action = 'copy'
     # get type of old repo to create new repo as same type
@@ -237,7 +244,7 @@ def rename_repo(url, token, old_repo_name, new_repo_name, ptype, action='copy', 
     rtype = json_object["rclass"]
     # create new repo with default settings
     urltopost = url + f'/artifactory/api/repositories/{new_repo_name}'
-    data = utilities.__setdata(new_repo_name, utilities.__setlayout(  # pylint: disable=W0212
+    data = utilities.__set_repo_data(new_repo_name, utilities.__setlayout(  # pylint: disable=W0212:protected-access
         ptype), ptype, rtype)
     response = requests.put(urltopost, headers=HEADERS, data=data, timeout=30)
     if response.ok:
@@ -255,7 +262,7 @@ def rename_repo(url, token, old_repo_name, new_repo_name, ptype, action='copy', 
                     f'/artifactory/api/{action}/{old_repo_name}{uri}?to=/{new_repo_name}{uri}'
                 response = requests.post(
                     urltopost, headers=HEADERS, timeout=30)
-                logging.info(utilities.__get_msg(response, 'messages')  # pylint: disable=W0212
+                logging.info(utilities.__get_msg(response, 'messages')  # pylint: disable=W0212:protected-access
                              )
             # delete old repo if flag set to True
             if delete:
@@ -267,5 +274,5 @@ def rename_repo(url, token, old_repo_name, new_repo_name, ptype, action='copy', 
         except KeyError:
             logging.error('%s not found', old_repo_name)
     else:
-        logging.error(utilities.__get_msg(response, 'errors')  # pylint: disable=W0212
+        logging.error(utilities.__get_msg(response, 'errors')  # pylint: disable=W0212:protected-access
                       )
