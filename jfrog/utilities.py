@@ -1,4 +1,5 @@
 """ shared functions to manage JFrog Platform """
+import json
 import logging
 
 # The different levels of logging, from highest urgency to lowest urgency, are:
@@ -42,9 +43,36 @@ def __validate_url(url):
     return url
 
 
-def __setdata(name, layout, ptype, rtype):
+def __set_repo_data(name, layout, ptype, rtype):
     """ This function sets the data to be sent for the creation of a repo """
-    return '{"key":"' + name + '","rclass":"' + rtype + '","packageType":"' + ptype + '", "xrayIndex":true,"repoLayoutRef":"' + layout + '"}'  # pylint: disable=line-too-long  # noqa: E501
+    data = {}
+    data["key"] = name
+    data["rclass"] = rtype
+    data["packageType"] = ptype
+    data["xrayIndex"] = 'true'
+    data["repoLayoutRef"] = layout
+    data = json.dumps(data)
+    return data
+
+
+def __set_token_data(description, scope, expires_in, refreshable, username, project_key):
+    """ This function sets the data to be sent for the creation of a token """
+    data = {}
+    if description is not None:
+        data["description"] = description
+    if scope is not None:
+        data["scope"] = scope
+    if expires_in is not None and expires_in > 0:
+        data["expires_in"] = expires_in
+    if refreshable:
+        data["refreshable"] = refreshable
+    if scope is not None:
+        data["username"] = username
+    if project_key is not None:
+        data["project_key"] = project_key
+    data["include_reference_token"] = True
+    data = json.dumps(data)
+    return data
 
 
 def __setlayout(ptype):

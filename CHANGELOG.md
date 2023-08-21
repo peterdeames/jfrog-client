@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.2.0
+
+### Added
+- Added function to rename a repository
+- Added function to generate a token
+
+### Updated
+- Refactored utilities to set data
+
 ## v0.1.0
 
 ### Added
