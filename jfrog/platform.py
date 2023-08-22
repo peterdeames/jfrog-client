@@ -2,7 +2,8 @@
 
 import logging
 import requests
-from jfrog import utilities
+from jfrog import artifactory, utilities
+
 
 HEADERS = {'content-type': 'application/json'}
 
@@ -33,20 +34,25 @@ def get_users(url, token, user_type=None):
     int
         number of users
     """
-    HEADERS.update({"Authorization": "Bearer " + token})
-    url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
-        url)
-    urltopost = url + "/access/api/v2/users"
-    response = requests.get(urltopost, headers=HEADERS, timeout=30)
-    userinfo = response.json()
-    userinfo = userinfo['users']
     count = 0
-    if user_type is None:
-        count = len(userinfo)
+    current_version = artifactory.artifactory_version(url, token)
+    if utilities.__checkversion(current_version, "7.49.3"):  # pylint: disable=W0212:protected-access
+        HEADERS.update({"Authorization": "Bearer " + token})
+        url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+            url)
+        urltopost = url + "/access/api/v2/users"
+        response = requests.get(urltopost, headers=HEADERS, timeout=30)
+        userinfo = response.json()
+        userinfo = userinfo['users']
+        if user_type is None:
+            count = len(userinfo)
+        else:
+            for user in userinfo:
+                if user['realm'] == user_type:
+                    count += 1
     else:
-        for user in userinfo:
-            if user['realm'] == user_type:
-                count += 1
+        logging.error(
+            "Can't get the count of users as the version of artifactory is < 7.49.3")
     return count
 
 
@@ -85,11 +91,54 @@ def create_token(url, token, description, scope=None, expires_in=None,  # pylint
     dict
         dictionary of token information
     """
+    current_version = artifactory.artifactory_version(url, token)
+    if utilities.__checkversion(current_version, "7.21.1"):  # pylint: disable=W0212:protected-access
+        HEADERS.update({"Authorization": "Bearer " + token})
+        url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+            url)
+        urltopost = url + "/access/api/v1/tokens"
+        data = utilities.__set_token_data(  # pylint: disable=W0212:protected-access disable=E1121:too-many-function-args
+            description, scope, expires_in, refreshable, username, project_key)
+        response = requests.post(
+            urltopost, headers=HEADERS, data=data, timeout=30)
+        token = response.text
+    else:
+        logging.error(
+            "Can't create a token as the version of artifactory is < 7.21.1")
+        token = ''
+    return token
+
+
+def get_default_token_expiry(url, token):
+    """
+    This function will create a new token
+
+    Parameters
+    ----------
+    arg1 : str
+        base URL of JFrog Platform
+    arg2 : str
+        access or identity token of admin account
+
+    Returns
+    -------
+    dict
+        dictionary of token information
+    """
     HEADERS.update({"Authorization": "Bearer " + token})
     url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
         url)
-    urltopost = url + "/access/api/v1/tokens"
-    data = utilities.__set_token_data(  # pylint: disable=W0212:protected-access disable=E1121:too-many-function-args
-        description, scope, expires_in, refreshable, username, project_key)
-    response = requests.post(urltopost, headers=HEADERS, data=data, timeout=30)
-    return response.text
+    current_version = artifactory.artifactory_version(url, token)
+    if utilities.__checkversion(current_version, "7.62.0"):  # pylint: disable=W0212:protected-access
+        urltopost = url + "/access/api/v1/tokens/default_expiry"
+        response = requests.get(urltopost, headers=HEADERS, timeout=30)
+        if response.ok:
+            expiryinfo = response.json()
+            expiry = expiryinfo['default_expiry']
+            logging.info(
+                "The default for a token expiry is set to %s seconds", expiry)
+    else:
+        logging.error(
+            "Can't get the default token expiry as the version of artifactory is < 7.62.x")
+        expiry = 0.0
+    return expiry
