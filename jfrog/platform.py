@@ -2,8 +2,9 @@
 
 import logging
 import requests
+from tabulate import tabulate
+from datetime import datetime
 from jfrog import artifactory, utilities
-
 
 HEADERS = {'content-type': 'application/json'}
 
@@ -54,6 +55,66 @@ def get_users(url, token, user_type=None):
         logging.error(
             "Can't get the count of users as the version of artifactory is < 7.49.3")
     return count
+
+
+def get_tokens(url, token, export=False):
+    """
+    Returns token information, based on the authenticated principal
+
+    An admin user can get all tokens and \n
+    Non-admin users only gets the tokens where their username matches the tokens' username
+
+    Parameters
+    ----------
+    arg1 : str
+        base URL of JFrog Platform
+    arg2 : str
+        access or identity token of admin account
+    arg3 : bool
+        flag to determine if an output file should be created
+
+    Returns
+    -------
+    list
+        list of dictionaries of token information
+    """
+    current_version = artifactory.artifactory_version(url, token)
+    if utilities.__checkversion(current_version, "7.21.1"):  # pylint: disable=W0212:protected-access
+        t_headers = ['ID', 'Subject', 'Issued',
+                     'Issuer', 'Expiry', 'Refreshable']
+        HEADERS.update({"Authorization": "Bearer " + token})
+        url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+            url)
+        urltopost = url + "/access/api/v1/tokens"
+        response = requests.get(urltopost, headers=HEADERS, timeout=30)
+        tokens = response.json()
+        tokens = tokens['tokens']
+        table = []
+        for t_id in tokens:
+            token_lst = []
+            token_lst.append(t_id['token_id'])
+            token_lst.append(t_id['subject'])
+            datetime_obj = datetime.utcfromtimestamp(t_id['issued_at'])
+            token_lst.append(datetime_obj.strftime("%d-%m-%Y %H:%M:%S"))
+            token_lst.append(t_id['issuer'])
+            try:
+                datetime_obj = datetime.utcfromtimestamp(t_id['expiry'])
+                token_lst.append(datetime_obj.strftime("%d-%m-%Y %H:%M:%S"))
+            except KeyError:
+                token_lst.append('')
+            token_lst.append(t_id['refreshable'])
+            table.append(token_lst)
+        if export and len(table) > 0:
+            print()
+            print(tabulate(table, headers=t_headers))
+            print()
+            with open('output.txt', 'w', encoding='utf-8') as file:
+                file.write(tabulate(table, headers=t_headers))
+    else:
+        logging.error(
+            "Can't create a token as the version of artifactory is < 7.21.1")
+        tokens = {}
+    return tokens
 
 
 def create_token(url, token, description, scope=None, expires_in=None,  # pylint: disable=R0913
