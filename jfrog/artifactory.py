@@ -71,9 +71,9 @@ def artifactory_version(url, token):
     response = requests.get(urltopost, headers=HEADERS, timeout=30)
     if response.ok:
         versioninfo = response.json()
-        logging.info(
-            "Your Artifactory Instance is currently running %s", versioninfo['version'])
         version = versioninfo['version']
+        logging.info(
+            "Your Artifactory Instance is currently running %s", version)
     else:
         logging.error("Could not determin the Artifactory version")
         print(tabulate(response.json()))

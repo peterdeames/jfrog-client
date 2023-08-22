@@ -1,12 +1,19 @@
 """ shared functions to manage JFrog Platform """
 import json
 import logging
+from packaging import version
 
 # The different levels of logging, from highest urgency to lowest urgency, are:
 # CRITICAL | ERROR | WARNING | INFO | DEBUG
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO
 )
+
+
+def __checkversion(current_version, lowest_version):
+    """ compares 2 versions to check current is higher than lowest """
+    check = version.parse(current_version) > version.parse(lowest_version)
+    return check
 
 
 def __get_msg(response, rtype):
