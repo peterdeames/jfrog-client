@@ -132,8 +132,10 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 ## Roadmap
 
 - [ ] Platform
-    - [X] Get Count of Users
-    - [X] Generate Token
+    - [x] Get Count of Users
+    - [x] Generate Token
+    - [x] Get Default Token Expiry
+    - [x] Set Deafult Expiry
 - [ ] Artifactory
     - [x] Ping Artifactory Instance
     - [x] Get Artifactory Version

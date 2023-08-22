@@ -111,7 +111,7 @@ def create_token(url, token, description, scope=None, expires_in=None,  # pylint
 
 def get_default_token_expiry(url, token):
     """
-    This function will create a new token
+    This function return the default token expiry in seconds
 
     Parameters
     ----------
@@ -142,3 +142,31 @@ def get_default_token_expiry(url, token):
             "Can't get the default token expiry as the version of artifactory is < 7.62.x")
         expiry = 0.0
     return expiry
+
+
+def set_default_token_expiry(url, token, expiry):
+    """
+    This function set a new default token expiry in seconds
+
+    Parameters
+    ----------
+    arg1 : str
+        base URL of JFrog Platform
+    arg2 : str
+        access or identity token of admin account
+    arg3 : int
+        default token expoiry in seconds
+    """
+    data = {}
+    data["default_expiry"] = expiry
+    HEADERS.update({"Authorization": "Bearer " + token})
+    url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+        url)
+    current_version = artifactory.artifactory_version(url, token)
+    if utilities.__checkversion(current_version, "7.62.0"):  # pylint: disable=W0212:protected-access
+        urltopost = url + "/access/api/v1/tokens/default_expiry"
+        # TODO: Check what is returned and output a validation message
+        requests.put(urltopost, headers=HEADERS, data=data, timeout=30)
+    else:
+        logging.error(
+            "Can't set the default token expiry as the version of artifactory is < 7.62.x")
