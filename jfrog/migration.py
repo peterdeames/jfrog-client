@@ -7,7 +7,6 @@ import requests
 from jfrog import utilities
 
 HEADERS = {'content-type': 'application/json'}
-ptlist = []
 
 # The different levels of logging, from highest urgency to lowest urgency, are:
 # CRITICAL | ERROR | WARNING | INFO | DEBUG
@@ -65,12 +64,12 @@ def sync_local_repos(source_url, source_token, target_url, target_token, user):
     logging.debug(target_response.text)
     for result in literal_eval(source_response.text):
         repo = result.get('key')
-        ptlist.append(result.get('packageType'))
         source_config = requests.get(
             source_url + '/artifactory/api/repositories/' + repo, headers=source_header, timeout=30)
         try:
             target_config = requests.put(
-                target_url + '/artifactory/api/repositories/' + repo, headers=target_header, data=source_config.text, timeout=30)
+                target_url + '/artifactory/api/repositories/' + repo,
+                headers=target_header, data=source_config.text, timeout=30)
             target_config.raise_for_status()
         except requests.HTTPError:
             target_config = requests.post(target_url + '/artifactory/api/repositories/' + repo,
