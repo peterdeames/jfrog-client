@@ -33,22 +33,20 @@ def __setdata(url, repo, user, pwd):
     return data
 
 
-def sync_local_repos(source_url, source_token, target_url, target_token, user, pwd):
+def sync_local_repos(source_url, source_token, target_url, target_token, user):
     """ compare the local repos and setup anything missing
     Parameters
     ----------
     arg1 : str
-        base URL of JFrog Platform
+        base URL of the source JFrog Platform
     arg2 : str
-        access or identity token of admin account
+        identity token of admin account for the source JFrog Platform
     arg3 : str
-        base URL of JFrog Platform
+        base URL of the target JFrog Platform
     arg4 : str
-        access or identity token of admin account
+        identity token of admin account for the target JFrog Platform
     arg5 : str
-        base URL of JFrog Platform
-    arg6 : str
-        access or identity token of admin account
+        username of the account to preform the replication to target JFrog Platform
 
     """
     source_url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
@@ -68,23 +66,22 @@ def sync_local_repos(source_url, source_token, target_url, target_token, user, p
     for result in literal_eval(source_response.text):
         repo = result.get('key')
         ptlist.append(result.get('packageType'))
-        if '-local' in repo:
-            source_config = requests.get(
-                source_url + '/artifactory/api/repositories/' + repo, headers=source_header, timeout=30)
-            try:
-                target_config = requests.put(
-                    target_url + '/artifactory/api/repositories/' + repo, headers=target_header, data=source_config.text, timeout=30)
-                target_config.raise_for_status()
-            except requests.HTTPError:
-                target_config = requests.post(target_url + '/artifactory/api/repositories/' + repo,
-                                              headers=target_header,
-                                              data=source_config.text, timeout=30)
-            data = __setdata(target_url + '/artifactory/' +
-                             repo, repo, user, pwd)
-            requests.put(source_url + '/artifactory/api/replications/' + repo,
-                         headers=source_header, data=data, timeout=30)
-            if target_config.ok:
-                logging.info(target_config.text)
-            else:
-                logging.critical(target_config.reason)
-                logging.critical(target_config.text)
+        source_config = requests.get(
+            source_url + '/artifactory/api/repositories/' + repo, headers=source_header, timeout=30)
+        try:
+            target_config = requests.put(
+                target_url + '/artifactory/api/repositories/' + repo, headers=target_header, data=source_config.text, timeout=30)
+            target_config.raise_for_status()
+        except requests.HTTPError:
+            target_config = requests.post(target_url + '/artifactory/api/repositories/' + repo,
+                                          headers=target_header,
+                                          data=source_config.text, timeout=30)
+        data = __setdata(target_url + '/artifactory/' +
+                         repo, repo, user, target_token)
+        requests.put(source_url + '/artifactory/api/replications/' + repo,
+                     headers=source_header, data=data, timeout=30)
+        if target_config.ok:
+            logging.info(target_config.text)
+        else:
+            logging.critical(target_config.reason)
+            logging.critical(target_config.text)
