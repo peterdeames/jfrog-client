@@ -10,3 +10,4 @@ nose
 nose2
 coverage
 tabulate
+packaging

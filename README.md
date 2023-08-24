@@ -134,8 +134,9 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 - [ ] Platform
     - [x] Get Count of Users
     - [x] Generate Token
+    - [x] Get Tokens
     - [x] Get Default Token Expiry
-    - [x] Set Deafult Expiry
+    - [x] Set Default Expiry
 - [ ] Artifactory
     - [x] Ping Artifactory Instance
     - [x] Get Artifactory Version
