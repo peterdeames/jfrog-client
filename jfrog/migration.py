@@ -1,6 +1,5 @@
 """ functions to enable the migration of JFrog Platform """
 
-import getpass
 import json
 import logging
 from ast import literal_eval
@@ -227,6 +226,8 @@ def check_repos(source_url, source_token, target_url, target_token, rtype):
         Valid options are: local|remote|virtual
 
     """
+    table = []
+    t_headers = ['Repo', 'Status']
     source_url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
         source_url)
     target_url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
@@ -252,7 +253,7 @@ def check_repos(source_url, source_token, target_url, target_token, rtype):
         target_count = target_count + 1
     logging.debug(target_count)
     if source_count == target_count:
-        logging.info('There are %d %s repos setup in the source env and %d %s repos setup in the target env',
+        logging.info('There are %d %s repos setup in the source env and %d %s repos setup in the target env',  # pylint: disable=line-too-long  # noqa: E501
                      source_count, rtype, target_count, rtype)
     else:
         logging.error('There are missing %s repos. Source = %d %s repos vs Target = %d %s repos',
@@ -260,12 +261,21 @@ def check_repos(source_url, source_token, target_url, target_token, rtype):
     logging.info('Checking if repo names match between %s and %s',
                  source_url, target_url)
     for result in literal_eval(source_response.text):
+        repo_lst = []
         repo = result.get('key')
         found = False
+        repo_lst.append(repo)
         for result in literal_eval(target_response.text):
             if repo == result.get('key'):
                 found = True
+                repo_lst.append('OK')
         if not found:
-            logging.warning('%s not found in target', repo)
+            # logging.warning('%s not found in target', repo)
+            repo_lst.append('Missing')
+        table.append(repo_lst)
+    if len(table) > 0:
+        print()
+        print(tabulate(table, headers=t_headers))
+        print()
     logging.info('%s repos check complete %s', rtype.title(), '\u2713')
     print('')
