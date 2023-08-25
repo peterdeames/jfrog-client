@@ -15,6 +15,15 @@ logging.basicConfig(
 )
 
 
+def __check_offline(source_config):
+    """ check if the remote repo is marked offline so it will not migrate """
+    logging.debug(source_config.text)
+    json_object = json.loads(source_config.text)
+    logging.debug(json_object)
+    logging.debug(json_object["offline"])
+    return json_object["offline"]
+
+
 def __setdata(url, repo, user, pwd):
     """ this function sets the data to be posted to Artifactory """
     data = {}
@@ -33,7 +42,9 @@ def __setdata(url, repo, user, pwd):
 
 
 def sync_local_repos(source_url, source_token, target_url, target_token, user):
-    """ compare the local repos and setup anything missing
+    """
+    This function is intented to compare the local repos and setup anything missing on the target JFP
+
     Parameters
     ----------
     arg1 : str
@@ -84,3 +95,58 @@ def sync_local_repos(source_url, source_token, target_url, target_token, user):
         else:
             logging.critical(target_config.reason)
             logging.critical(target_config.text)
+
+
+def sync_remote_repos(source_url, source_token, target_url, target_token):
+    """
+    This function is intented to compare the remote repos and setup anything missing on the target JFP
+
+    Parameters
+    ----------
+    arg1 : str
+        base URL of the source JFrog Platform
+    arg2 : str
+        identity token of admin account for the source JFrog Platform
+    arg3 : str
+        base URL of the target JFrog Platform
+    arg4 : str
+        identity token of admin account for the target JFrog Platform
+    arg5 : str
+        username of the account to preform the replication to target JFrog Platform
+
+    """
+    source_url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+        source_url)
+    target_url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+        target_url)
+    source_header = HEADERS
+    target_header = HEADERS
+    source_header.update({"Authorization": "Bearer " + source_token})
+    target_header.update({"Authorization": "Bearer " + target_token})
+    source_response = requests.get(
+        source_url + '/artifactory/api/repositories?type=remote', headers=source_header, timeout=30)
+    logging.debug(source_response.text)
+    target_response = requests.get(
+        target_url + '/artifactory/api/repositories?type=remote', headers=target_header, timeout=30)
+    logging.debug(target_response.text)
+    for result in literal_eval(source_response.text):
+        repo = result.get('key')
+        source_config = requests.get(
+            source_url + '/artifactory/api/repositories/' + repo, headers=source_header, timeout=30)
+        if __check_offline(source_config):
+            logging.warning('%s is offline and will not be migrated', repo)
+        else:
+            try:
+                target_config = requests.put(target_url + '/artifactory/api/repositories/' + repo,
+                                             headers=target_header,
+                                             data=source_config.text, timeout=30)
+                target_config.raise_for_status()
+            except requests.HTTPError:
+                target_config = requests.post(target_url + '/artifactory/api/repositories/' + repo,
+                                              headers=target_header,
+                                              data=source_config.text, timeout=30)
+            if target_config.ok:
+                logging.info(target_config.text)
+            else:
+                logging.critical(target_config.reason)
+                logging.critical(target_config.text)
