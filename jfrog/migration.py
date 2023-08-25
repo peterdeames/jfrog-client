@@ -6,7 +6,7 @@ from ast import literal_eval
 import requests
 from tabulate import tabulate
 
-from jfrog import utilities
+from jfrog import artifactory, utilities
 
 SOURCE_HEADER = {'content-type': 'application/json'}
 TARGET_HEADER = {'content-type': 'application/json'}
@@ -277,5 +277,85 @@ def check_repos(source_url, source_token, target_url, target_token, rtype):
         print()
         print(tabulate(table, headers=t_headers))
         print()
+        with open(f'{rtype}_repos.txt', 'w', encoding='utf-8') as file:
+            file.write(tabulate(table, headers=t_headers))
     logging.info('%s repos check complete %s', rtype.title(), '\u2713')
     print('')
+
+
+def check_groups(source_url, source_token, target_url, target_token):
+    """
+    This function is intented to compare and report on
+    group differences between 2 JFP Instances
+
+    Parameters
+    ----------
+    arg1 : str
+        base URL of the source JFrog Platform
+    arg2 : str
+        identity token of admin account for the source JFrog Platform
+    arg3 : str
+        base URL of the target JFrog Platform
+    arg4 : str
+        identity token of admin account for the target JFrog Platform
+
+    """
+    source_version = artifactory.artifactory_version(source_url, source_token)
+    target_version = artifactory.artifactory_version(target_url, target_token)
+    if utilities.__checkversion(source_version, "7.49.3") and utilities.__checkversion(target_version, "7.49.3"):  # pylint: disable=W0212:protected-access
+        table = []
+        t_headers = ['Group', 'Status']
+        source_url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+            source_url)
+        target_url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+            target_url)
+        logging.info("Comparing groups from %s to %s", source_url, target_url)
+        SOURCE_HEADER.update({"Authorization": "Bearer " + source_token})
+        TARGET_HEADER.update({"Authorization": "Bearer " + target_token})
+        source_count = 0
+        target_count = 0
+        source_response = requests.get(source_url + '/access/api/v2/groups',
+                                       headers=SOURCE_HEADER, timeout=30)
+        logging.debug(source_response.text)
+        source_groups = source_response.json()
+        source_groups = source_groups['groups']
+        source_count = len(source_groups)
+        logging.debug(source_count)
+        target_response = requests.get(target_url + '/access/api/v2/groups',
+                                       headers=TARGET_HEADER, timeout=30)
+        logging.debug(target_response.text)
+        target_groups = target_response.json()
+        target_groups = target_groups['groups']
+        target_count = len(target_groups)
+        logging.debug(target_count)
+        if target_count >= source_count:
+            logging.info('There are %d groups in the source env and %d groups in the target env',
+                         source_count, target_count)
+        else:
+            logging.error(
+                'There are missing groups. Source = %d groups vs Target = %d groups',
+                source_count, target_count)
+        for result in source_groups:
+            repo_lst = []
+            group = result['group_name'].upper()
+            found = False
+            repo_lst.append(group)
+            for result in target_groups:
+                if group == result['group_name'].upper():
+                    found = True
+                    repo_lst.append('OK')
+            if not found:
+                repo_lst.append('Missing')
+                # logging.warning('%s group not found in target', group)
+            table.append(repo_lst)
+        if len(table) > 0:
+            print()
+            print(tabulate(table, headers=t_headers))
+            print()
+            with open('groups.txt', 'w', encoding='utf-8') as file:
+                file.write(tabulate(table, headers=t_headers))
+        logging.info('Groups check complete %s', '\u2713')
+        print('')
+    else:
+        logging.error(
+            "Can't perform the check on groups as one of the versions of artifactory is < 7.49.3")
