@@ -359,3 +359,80 @@ def check_groups(source_url, source_token, target_url, target_token):
     else:
         logging.error(
             "Can't perform the check on groups as one of the versions of artifactory is < 7.49.3")
+
+
+def check_permissions(source_url, source_token, target_url, target_token):
+    """
+    This function is intented to compare and report on
+    permission differences between 2 JFP Instances
+
+    Parameters
+    ----------
+    arg1 : str
+        base URL of the source JFrog Platform
+    arg2 : str
+        identity token of admin account for the source JFrog Platform
+    arg3 : str
+        base URL of the target JFrog Platform
+    arg4 : str
+        identity token of admin account for the target JFrog Platform
+
+    """
+    source_version = artifactory.artifactory_version(source_url, source_token)
+    target_version = artifactory.artifactory_version(target_url, target_token)
+    if utilities.__checkversion(source_version, "6.6.0") and utilities.__checkversion(target_version, "6.6.0"):  # pylint: disable=W0212:protected-access
+        table = []
+        t_headers = ['Permission', 'Status']
+        source_url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+            source_url)
+        target_url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+            target_url)
+        logging.info("Comparing permissions from %s to %s",
+                     source_url, target_url)
+        SOURCE_HEADER.update({"Authorization": "Bearer " + source_token})
+        TARGET_HEADER.update({"Authorization": "Bearer " + target_token})
+        source_count = 0
+        target_count = 0
+        source_response = requests.get(source_url + '/artifactory/api/security/permissions',
+                                       headers=SOURCE_HEADER, timeout=30)
+        logging.debug(source_response.text)
+        source_permissions = source_response.json()
+        source_count = len(source_permissions)
+        logging.debug(source_count)
+        target_response = requests.get(
+            target_url + '/artifactory/api/security/permissions', headers=TARGET_HEADER, timeout=30)
+        logging.debug(target_response.text)
+        target_permissions = target_response.json()
+        target_count = len(target_permissions)
+        logging.debug(target_count)
+        if target_count >= source_count:
+            logging.error(
+                'There are missing permissions.  Source = %d permissions vs Target = %d permissions',
+                source_count, target_count)
+        else:
+            logging.info('There are %d permissions in the source env and %d permissions in the target env',
+                         source_count, target_count)
+        for result in literal_eval(source_response.text):
+            repo_lst = []
+            permission = result.get('name')
+            found = False
+            repo_lst.append(permission)
+            for result in literal_eval(target_response.text):
+                if permission.upper() == result.get('name').upper():
+                    found = True
+                    repo_lst.append('OK')
+            if not found:
+                repo_lst.append('Missing')
+                # logging.warning('%s permission not found in target', permission)
+            table.append(repo_lst)
+        if len(table) > 0:
+            print()
+            print(tabulate(table, headers=t_headers))
+            print()
+            with open('permissions.txt', 'w', encoding='utf-8') as file:
+                file.write(tabulate(table, headers=t_headers))
+        logging.info('Permissions check complete %s', '\u2713')
+        print('')
+    else:
+        logging.error(
+            "Can't perform the check on groups as one of the versions of artifactory is < 6.6.0")
