@@ -2,10 +2,10 @@
 
 import json
 import logging
+import time
 from ast import literal_eval
 import requests
 from tabulate import tabulate
-
 from jfrog import artifactory, utilities
 
 SOURCE_HEADER = {'content-type': 'application/json'}
@@ -399,8 +399,8 @@ def check_permissions(source_url, source_token, target_url, target_token):
         source_permissions = source_response.json()
         source_count = len(source_permissions)
         logging.debug(source_count)
-        target_response = requests.get(
-            target_url + '/artifactory/api/security/permissions', headers=TARGET_HEADER, timeout=30)
+        target_response = requests.get(target_url + '/artifactory/api/security/permissions',
+                                       headers=TARGET_HEADER, timeout=30)
         logging.debug(target_response.text)
         target_permissions = target_response.json()
         target_count = len(target_permissions)
@@ -435,4 +435,109 @@ def check_permissions(source_url, source_token, target_url, target_token):
         print('')
     else:
         logging.error(
-            "Can't perform the check on groups as one of the versions of artifactory is < 6.6.0")
+            "Can't perform the check on permissions as one of the versions of artifactory is < 6.6.0")  # pylint: disable=line-too-long  # noqa: E501
+
+
+def check_artifacts(source_url, source_token, target_url, target_token):
+    """
+    This function is intented to compare and report on
+    artifact differences between 2 JFP Instances
+
+    Parameters
+    ----------
+    arg1 : str
+        base URL of the source JFrog Platform
+    arg2 : str
+        identity token of admin account for the source JFrog Platform
+    arg3 : str
+        base URL of the target JFrog Platform
+    arg4 : str
+        identity token of admin account for the target JFrog Platform
+
+    """
+    source_url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+        source_url)
+    target_url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+        target_url)
+    logging.info("Comparing artifacts from %s to %s",
+                 source_url, target_url)
+    SOURCE_HEADER.update({"Authorization": "Bearer " + source_token})
+    TARGET_HEADER.update({"Authorization": "Bearer " + target_token})
+    logging.info('Checking artifact replication')
+    # requests.post(source_url + '/artifactory/api/storageinfo/calculate',
+    #              headers=SOURCE_HEADER, timeout=30)
+    # requests.post(target_url + '/artifactory/api/storageinfo/calculate',
+    #              headers=TARGET_HEADER, timeout=30)
+    # time.sleep(100)
+    source_response = requests.get(source_url + '/artifactory/api/storageinfo',
+                                   headers=SOURCE_HEADER, timeout=30)
+    target_response = requests.get(target_url + '/artifactory/api/storageinfo',
+                                   headers=TARGET_HEADER, timeout=30)
+    table = []
+    t_headers = ['Repo', 'Repo Type', 'Source Count', 'Target Count']
+    for sresult in literal_eval(source_response.text)["repositoriesSummaryList"]:
+        repo_lst = []
+        repo = sresult.get('repoKey')
+        rtype = sresult.get('repoType')
+        source_count = sresult.get('filesCount')
+        if rtype != 'REMOTE' and rtype != 'NA' and repo != 'jfrog-usage-logs':
+            repo_lst.append(repo)
+            repo_lst.append(rtype)
+            repo_lst.append(source_count)
+            for tresult in literal_eval(target_response.text)["repositoriesSummaryList"]:
+                if tresult.get('repoKey') == repo:
+                    target_count = tresult.get('filesCount')
+                    repo_lst.append(target_count)
+        #                    if source_count != target_count:
+        #                        if source_count > target_count:
+        #                            diff = source_count - target_count
+        #                            if diff >= 1000:
+        #                                logging.critical('There are differences in artifact counts in ' + repo +
+        #                                                 '.  Source = %d items vs Target = %d items (%d items)', source_count, target_count, diff)
+        #                            elif diff >= 100:
+        #                                logging.error('There are differences in artifact counts in ' + repo +
+        #                                              '.  Source = %d items vs Target = %d items (%d items)', source_count, target_count, diff)
+        #                            else:
+        #                                logging.warning('There are differences in artifact counts in ' + repo +
+        #                                                '.  Source = %d items vs Target = %d items (%d items)', source_count, target_count, diff)
+        #                            try:
+        #                                os.mkdir('repo-details')
+        #                            except OSError:
+        #                                pass
+        #                            if diff <= 300 and diff > 0:
+        #                                logging.info('Attempting manual update')
+        #                                manual = True
+        #                                # with open('repo-details/' + repo + '.txt', 'w') as f:
+        #                                #     f.write(' '.join(detailed_artifact_check(repo, manual)))
+        #                        else:
+        #                            logging.info('There are differences in artifact counts in ' + repo +
+        #                                         '.  Source = %d items vs Target = %d items', source_count, target_count)
+                    table.append(repo_lst)
+                    break
+        #    stotalartifacts = source_response.json()
+        #    stotalartifacts = stotalartifacts['binariesSummary']['artifactsCount']
+        #    ttotalartifacts = target_response.json()
+        #    ttotalartifacts = ttotalartifacts['binariesSummary']['artifactsCount']
+        #    logging.info('There are %s artifacts on-prem and %s artifacts in SAAS',
+        #                 stotalartifacts, ttotalartifacts)
+        #    print('')
+    if len(table) > 0:
+        print()
+        print(tabulate(table, headers=t_headers))
+        print()
+        with open('artifacts.txt', 'w', encoding='utf-8') as file:
+            file.write(tabulate(table, headers=t_headers))
+    logging.info('Artifact check complete %s', '\u2713')
+    print('')
+
+
+if __name__ == "__main__":
+    source_url = 'https://artifactory-gdd.sdo.jlrmotor.com'
+    source_token = 'cmVmdGtuOjAxOjE3MjQ1MjkzMDk6eHVyZldxTTdadmIwdVcycTMxS0s2emJaY3Bl'
+    target_url = 'https://artifactory-gdd-dev.sdo.jlrmotor.com'
+    target_token = 'cmVmdGtuOjAxOjE3MjE4MTA2NDI6T1B4dEdYTnlqS0JvUVRLQ0I5OG8xRzJkckZu'
+    # rtype = 'remote'
+    # check_repos(source_url, source_token, target_url, target_token, rtype)
+    # check_groups(source_url, source_token, target_url, target_token)
+    # check_permissions(source_url, source_token, target_url, target_token)
+    check_artifacts(source_url, source_token, target_url, target_token)
