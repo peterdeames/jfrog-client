@@ -1,9 +1,9 @@
 """ functions to manage Artifactory """
 
 import logging
+from datetime import datetime
 import requests
 from tabulate import tabulate
-from datetime import datetime
 from jfrog import artifactory, utilities
 
 HEADERS = {'content-type': 'application/json'}
