@@ -16,7 +16,7 @@ logging.basicConfig(
 
 def xray_ping(url, token):
     """
-    This function is intented to get the health info of Jfrog xray
+    This function is intented to get the health info of JFrog xray
 
     Parameters
     ----------
@@ -31,7 +31,8 @@ def xray_ping(url, token):
         reponse
     """
     HEADERS.update({"Authorization": "Bearer " + token})
-    url = utilities.__validate_url(url)  # pylint: disable=W0212
+    url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+        url)
     urltopost = url + "/xray/api/v1/system/ping"
     response = requests.get(urltopost, headers=HEADERS, timeout=30)
     if response.ok:
@@ -52,7 +53,7 @@ def xray_version(url, token):
     Parameters
     ----------
     arg1 : str
-        base URL of Jfrog PLatform
+        base URL of JFrog Platform
     arg2 : str
         access or identity token of admin account
 
@@ -62,7 +63,8 @@ def xray_version(url, token):
         version of xray
     """
     HEADERS.update({"Authorization": "Bearer " + token})
-    url = utilities.__validate_url(url)  # pylint: disable=W0212
+    url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+        url)
     urltopost = url + "/xray/api/v1/system/version"
     response = requests.get(urltopost, headers=HEADERS, timeout=30)
     if response.ok:

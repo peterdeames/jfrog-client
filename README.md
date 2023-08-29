@@ -132,17 +132,33 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 ## Roadmap
 
 - [ ] Platform
-    - [X] Get Count of Users
+    - [x] Get Count of Users
+    - [x] Generate Token
+    - [x] Get Tokens
+    - [x] Get Default Token Expiry
+    - [x] Set Default Expiry
 - [ ] Artifactory
     - [x] Ping Artifactory Instance
     - [x] Get Artifactory Version
     - [x] Get Artifactory Licence Details
     - [x] Get Count of Repositories
+    - [x] Rename Repository
 - [ ] Mission Control
     - [X] Ping Mission Control Instance
 - [ ] Xray
     - [x] Ping Xray Instance
     - [x] Get Xray Version
+- [ ] Migration
+    - [ ] Setup and Migrate Local Repos
+    - [ ] Setup Remote Repos
+    - [ ] Setup Virtual Repos
+    - [ ] Setup Groups
+    - [ ] Setup Permissions
+    - [ ] Setup Projects
+    - [x] Report the repos differences between 2 JFP Instances
+    - [x] Report the group differences between 2 JFP Instances
+    - [x] Report the permission differences between 2 JFP Instances
+    - [x] Report the artifact differences between 2 JFP Instances
 
 
 See the [open issues](https://github.com/peterdeames/jfrog-client/issues) for a full list of proposed features (and known issues).

@@ -16,7 +16,7 @@ logging.basicConfig(
 
 def missioncontrol_ping(url, token):
     """
-    This function is intented to get the health info of Jfrog Platform
+    This function is intented to get the health info of JFrog Platform
 
     Parameters
     ----------
@@ -31,7 +31,8 @@ def missioncontrol_ping(url, token):
         reponse
     """
     HEADERS.update({"Authorization": "Bearer " + token})
-    url = utilities.__validate_url(url)  # pylint: disable=W0212
+    url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+        url)
     urltopost = url + "/mc/api/system/ping"
     response = requests.get(urltopost, headers=HEADERS, timeout=30)
     if response.ok:
