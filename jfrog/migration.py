@@ -2,6 +2,7 @@
 
 import json
 import logging
+import sys
 import time
 from ast import literal_eval
 import requests
@@ -459,16 +460,18 @@ def check_artifacts(source_url, source_token, target_url, target_token):
         source_url)
     target_url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
         target_url)
-    logging.info("Comparing artifacts from %s to %s",
-                 source_url, target_url)
     SOURCE_HEADER.update({"Authorization": "Bearer " + source_token})
     TARGET_HEADER.update({"Authorization": "Bearer " + target_token})
-    logging.info('Checking artifact replication')
+    logging.info("Recalculating storage on %s and %s",
+                 source_url, target_url)
+    logging.info("This may take up to 2 mins..")
     # requests.post(source_url + '/artifactory/api/storageinfo/calculate',
     #              headers=SOURCE_HEADER, timeout=30)
     # requests.post(target_url + '/artifactory/api/storageinfo/calculate',
     #              headers=TARGET_HEADER, timeout=30)
-    # time.sleep(100)
+    utilities.__progressbar(100)  # pylint: disable=W0212:protected-access
+    logging.info("Comparing artifacts from %s to %s",
+                 source_url, target_url)
     source_response = requests.get(source_url + '/artifactory/api/storageinfo',
                                    headers=SOURCE_HEADER, timeout=30)
     target_response = requests.get(target_url + '/artifactory/api/storageinfo',
@@ -488,39 +491,34 @@ def check_artifacts(source_url, source_token, target_url, target_token):
                 if tresult.get('repoKey') == repo:
                     target_count = tresult.get('filesCount')
                     repo_lst.append(target_count)
-        #                    if source_count != target_count:
-        #                        if source_count > target_count:
-        #                            diff = source_count - target_count
-        #                            if diff >= 1000:
-        #                                logging.critical('There are differences in artifact counts in ' + repo +
-        #                                                 '.  Source = %d items vs Target = %d items (%d items)', source_count, target_count, diff)
-        #                            elif diff >= 100:
-        #                                logging.error('There are differences in artifact counts in ' + repo +
-        #                                              '.  Source = %d items vs Target = %d items (%d items)', source_count, target_count, diff)
-        #                            else:
-        #                                logging.warning('There are differences in artifact counts in ' + repo +
-        #                                                '.  Source = %d items vs Target = %d items (%d items)', source_count, target_count, diff)
-        #                            try:
-        #                                os.mkdir('repo-details')
-        #                            except OSError:
-        #                                pass
-        #                            if diff <= 300 and diff > 0:
-        #                                logging.info('Attempting manual update')
-        #                                manual = True
-        #                                # with open('repo-details/' + repo + '.txt', 'w') as f:
-        #                                #     f.write(' '.join(detailed_artifact_check(repo, manual)))
-        #                        else:
-        #                            logging.info('There are differences in artifact counts in ' + repo +
-        #                                         '.  Source = %d items vs Target = %d items', source_count, target_count)
+                    if source_count != target_count:
+                        if source_count > target_count:
+                            diff = source_count - target_count
+                            if diff >= 1000:
+                                logging.critical(
+                                    'There are differences in artifact counts in %s.  Source = %d items vs Target = %d items (%d items)',  # pylint: disable=line-too-long  # noqa: E501
+                                    repo, source_count, target_count, diff)
+                            elif diff >= 100:
+                                logging.error(
+                                    'There are differences in artifact counts in %s.  Source = %d items vs Target = %d items (%d items)',  # pylint: disable=line-too-long  # noqa: E501
+                                    repo, source_count, target_count, diff)
+                            else:
+                                logging.warning(
+                                    'There are differences in artifact counts in %s.  Source = %d items vs Target = %d items (%d items)',  # pylint: disable=line-too-long  # noqa: E501
+                                    repo, source_count, target_count, diff)
+
+                        else:
+                            logging.info(
+                                'There are differences in artifact counts in %s.  Source = %d items vs Target = %d items',  # pylint: disable=line-too-long  # noqa: E501
+                                repo, source_count, target_count)
                     table.append(repo_lst)
                     break
-        #    stotalartifacts = source_response.json()
-        #    stotalartifacts = stotalartifacts['binariesSummary']['artifactsCount']
-        #    ttotalartifacts = target_response.json()
-        #    ttotalartifacts = ttotalartifacts['binariesSummary']['artifactsCount']
-        #    logging.info('There are %s artifacts on-prem and %s artifacts in SAAS',
-        #                 stotalartifacts, ttotalartifacts)
-        #    print('')
+    stotalartifacts = source_response.json()
+    stotalartifacts = stotalartifacts['binariesSummary']['artifactsCount']
+    ttotalartifacts = target_response.json()
+    ttotalartifacts = ttotalartifacts['binariesSummary']['artifactsCount']
+    logging.info('There are %s artifacts in %s and %s artifacts in %s',
+                 stotalartifacts, source_url, ttotalartifacts, target_url)
     if len(table) > 0:
         print()
         print(tabulate(table, headers=t_headers))
@@ -529,15 +527,3 @@ def check_artifacts(source_url, source_token, target_url, target_token):
             file.write(tabulate(table, headers=t_headers))
     logging.info('Artifact check complete %s', '\u2713')
     print('')
-
-
-if __name__ == "__main__":
-    source_url = 'https://artifactory-gdd.sdo.jlrmotor.com'
-    source_token = 'cmVmdGtuOjAxOjE3MjQ1MjkzMDk6eHVyZldxTTdadmIwdVcycTMxS0s2emJaY3Bl'
-    target_url = 'https://artifactory-gdd-dev.sdo.jlrmotor.com'
-    target_token = 'cmVmdGtuOjAxOjE3MjE4MTA2NDI6T1B4dEdYTnlqS0JvUVRLQ0I5OG8xRzJkckZu'
-    # rtype = 'remote'
-    # check_repos(source_url, source_token, target_url, target_token, rtype)
-    # check_groups(source_url, source_token, target_url, target_token)
-    # check_permissions(source_url, source_token, target_url, target_token)
-    check_artifacts(source_url, source_token, target_url, target_token)
