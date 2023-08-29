@@ -13,7 +13,7 @@ TARGET_HEADER = {'content-type': 'application/json'}
 # The different levels of logging, from highest urgency to lowest urgency, are:
 # CRITICAL | ERROR | WARNING | INFO | DEBUG
 logging.basicConfig(
-    format="%(asctime)s - %(levelname)s - %(message)s", level=logging.DEBUG
+    format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 
 
