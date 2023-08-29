@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.0.0
+
+### Added
+- Added functions to migrate from 1 JFP insatance to another
+- Added functions to compare 2 JPF instances
+
+## v0.2.1
+
+### Added
+- Added function to get default token expiry
+- Added function to set defaut expiry
+
 ## v0.2.0
 
 ### Added
