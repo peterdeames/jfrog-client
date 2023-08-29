@@ -158,6 +158,7 @@ _For more examples, please refer to the [Documentation](https://example.com)_
     - [x] Report the repos differences between 2 JFP Instances
     - [x] Report the group differences between 2 JFP Instances
     - [x] Report the permission differences between 2 JFP Instances
+    - [x] Report the artifact differences between 2 JFP Instances
 
 
 See the [open issues](https://github.com/peterdeames/jfrog-client/issues) for a full list of proposed features (and known issues).

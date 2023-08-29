@@ -2,8 +2,6 @@
 
 import json
 import logging
-import sys
-import time
 from ast import literal_eval
 import requests
 from tabulate import tabulate
