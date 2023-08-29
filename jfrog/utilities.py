@@ -1,6 +1,9 @@
 """ shared functions to manage JFrog Platform """
 import json
 import logging
+import sys
+import time
+
 from packaging import version
 
 # The different levels of logging, from highest urgency to lowest urgency, are:
@@ -8,6 +11,25 @@ from packaging import version
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO
 )
+
+
+def __progressbar(duration):
+    """ prints a progress bar on screen """
+    toolbar_width = duration
+
+    # setup toolbar
+    sys.stdout.write("[%s]" % (" " * toolbar_width))
+    sys.stdout.flush()
+    # return to start of line, after '['
+    sys.stdout.write("\b" * (toolbar_width+1))
+
+    for _ in range(toolbar_width):
+        time.sleep(1)  # do real work here
+        # update the bar
+        sys.stdout.write("#")
+        sys.stdout.flush()
+
+    sys.stdout.write("]\n")  # this ends the progress bar
 
 
 def __checkversion(current_version, lowest_version):
