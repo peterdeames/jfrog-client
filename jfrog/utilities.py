@@ -113,3 +113,10 @@ def __setlayout(ptype):
     if ptype.lower() in specialtypes:
         return ptype.lower() + '-default'
     return 'simple-default'
+
+
+def __setname(team, central_name, tech, maturity, locator):
+    """ This functions sets the name of the repo """
+    name = '-'.join(filter(None, [central_name,
+                    team, tech, maturity, locator]))
+    return name
