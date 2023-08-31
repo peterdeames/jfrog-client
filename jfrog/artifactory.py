@@ -276,3 +276,52 @@ def rename_repo(url, token, old_repo_name, new_repo_name, ptype, action='copy', 
     else:
         logging.error(utilities.__get_msg(response, 'errors')  # pylint: disable=W0212:protected-access
                       )
+
+
+def create_local_repo(url, token, team, ptype, maturity, locator):
+    """
+    This function will create a local repository with default values\n
+    Refers to the
+    https://jfrog.com/whitepaper/best-practices-structuring-naming-artifactory-repositories
+
+    Parameters
+    ----------
+    arg1 : str
+        base URL of JFrog Platform
+    arg2 : str
+        access or identity token of admin account
+    arg3 : str
+        project name or source of the project
+    arg4 : str
+        refers to the type of tool or package
+    arg5 : str
+        refers to the package maturity level, such as the development, staging and release
+    arg6 : str
+        refers to the physical topology of your artifacts
+
+    """
+    HEADERS.update({"Authorization": "Bearer " + token})
+    url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+        url)
+    name = utilities.__setname(  # pylint: disable=W0212:protected-access
+        team, '', ptype, maturity, locator)
+    logging.debug(name)
+    urltopost = url + f'/artifactory/api/repositories/{name}'
+    layout = utilities.__setlayout(  # pylint: disable=W0212:protected-access
+        ptype)
+    logging.debug(layout)
+    data = utilities.__set_repo_data(  # pylint: disable=W0212:protected-access
+        name, layout, ptype, 'local')
+    logging.debug(data)
+    try:
+        response = requests.put(urltopost, headers=HEADERS,
+                                data=data, timeout=30)
+        response.raise_for_status()
+    except requests.HTTPError:
+        response = requests.post(urltopost, headers=HEADERS,
+                                 data=data, timeout=30)
+    if response.ok:
+        logging.info(response.text)
+    else:
+        logging.error(utilities.__get_msg(response, 'errors')  # pylint: disable=W0212:protected-access
+                      )
