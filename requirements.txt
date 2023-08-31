@@ -1,6 +1,6 @@
-setuptools
+setuptools>=65.5.1 # pinned by Snyk to avoid a vulnerability
 build
-wheel
+wheel>=0.38.0 # pinned by Snyk to avoid a vulnerability
 sphinx
 twine
 requests
