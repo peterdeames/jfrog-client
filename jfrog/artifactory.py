@@ -6,7 +6,7 @@ from tabulate import tabulate
 from jfrog import utilities
 
 HEADERS = {'content-type': 'application/json'}
-JAVATYPES = ['maven', 'gradle', 'ivy']
+
 
 # The different levels of logging, from highest urgency to lowest urgency, are:
 # CRITICAL | ERROR | WARNING | INFO | DEBUG
@@ -273,6 +273,72 @@ def rename_repo(url, token, old_repo_name, new_repo_name, ptype, action='copy', 
                 logging.info(response.text)
         except KeyError:
             logging.error('%s not found', old_repo_name)
+    else:
+        logging.error(utilities.__get_msg(response, 'errors')  # pylint: disable=W0212:protected-access
+                      )
+
+
+def create_local_repo(url, token, dict_name, dict_data=None):
+    """
+    This function will create a local repository with default values\n
+    Refers to the
+    https://jfrog.com/whitepaper/best-practices-structuring-naming-artifactory-repositories
+
+    Parameters
+    ----------
+    arg1 : str
+        base URL of JFrog Platform
+    arg2 : str
+        access or identity token of admin account
+    arg3: dict
+        dictionary of name parts to make up the 4 part naming\n
+            {"team": "", "tech": "","maturity": "", "locator": ""}\n
+        team - project name or source of the project\n
+        tech - refers to the type of tool or package\n
+        maturity - refers to the package maturity level,
+        such as the development, staging and release\n
+        locator - refers to the physical topology of your artifacts
+    arg4: dict
+        dictionary of repository configurations\n
+        Refer to https://jfrog.com/help/r/jfrog-rest-apis/repository-configuration-json
+        for valid configurations
+
+    """
+    team = None
+    tech = None
+    maturity = None
+    locator = None
+    for key in dict_name:
+        if key == 'team':
+            team = dict_name[key]
+        if key == 'tech':
+            tech = dict_name[key]
+        if key == 'maturity':
+            maturity = dict_name[key]
+        if key == 'locator':
+            locator = dict_name[key]
+    HEADERS.update({"Authorization": "Bearer " + token})
+    url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+        url)
+    name = utilities.__setname(  # pylint: disable=W0212:protected-access
+        team, None, tech, maturity, locator)
+    logging.debug(name)
+    urltopost = url + f'/artifactory/api/repositories/{name}'
+    layout = utilities.__setlayout(  # pylint: disable=W0212:protected-access
+        tech)
+    logging.debug(layout)
+    data = utilities.__set_repo_data(  # pylint: disable=W0212:protected-access
+        name, layout, tech, 'local', dict_data)
+    logging.debug(data)
+    try:
+        response = requests.put(urltopost, headers=HEADERS,
+                                data=data, timeout=30)
+        response.raise_for_status()
+    except requests.HTTPError:
+        response = requests.post(urltopost, headers=HEADERS,
+                                 data=data, timeout=30)
+    if response.ok:
+        logging.info(response.text)
     else:
         logging.error(utilities.__get_msg(response, 'errors')  # pylint: disable=W0212:protected-access
                       )
