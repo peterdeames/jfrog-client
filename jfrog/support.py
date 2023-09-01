@@ -2,8 +2,8 @@
 
 import json
 import logging
-
 import requests
+from tabulate import tabulate
 from tqdm import tqdm
 
 from jfrog import utilities
@@ -49,6 +49,7 @@ def create_support_bundle(url, token, name, description, dic_config=None):
     -------
     str
         id of the created bundle
+
     """
     if dic_config is None:
         dic_config = {}
@@ -105,3 +106,38 @@ def get_support_bundle(url, token, bundle_id):
                 for chunk in r.iter_content(chunk_size=8192):
                     pb.update(len(chunk))
                     f.write(chunk)
+
+
+def list_support_bundles(url, token):
+    """
+    This function lists all support bundles
+
+    Parameters
+    ----------
+    arg1 : str
+        base URL of JFrog Platform
+    arg2 : str
+        access or identity token of admin account
+
+    Returns
+    -------
+    json
+        json response of bundles
+
+    """
+    HEADERS.update({"Authorization": "Bearer " + token})
+    url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+        url)
+    urltopost = url + "/artifactory/api/system/support/bundles"
+    logging.info('Getting Support Bundles')
+    response = requests.get(urltopost, headers=HEADERS, timeout=30)
+    if response.ok:
+        bundleinfo = response.json()
+        bundles = bundleinfo['bundles']
+        print(tabulate(bundles, headers="keys"))
+        bundles = response.text
+    else:
+        logging.error(utilities.__get_msg(response, 'errors')  # pylint: disable=W0212:protected-access
+                      )
+        bundles = ''
+    return bundles
