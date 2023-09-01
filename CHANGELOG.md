@@ -3,8 +3,10 @@
 ## v1.2.1
 
 ### Added
-- Added function to create support bundle
-- Added function to download support bundle
+- Added function to create a support bundle
+- Added function to download a support bundle
+- Added function to list support bundles
+- Added function to delete a support bundle
 
 
 ## v1.1.1

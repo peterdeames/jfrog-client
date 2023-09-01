@@ -2,6 +2,7 @@
 
 import json
 import logging
+from datetime import datetime, timedelta
 import requests
 from tabulate import tabulate
 from tqdm import tqdm
@@ -19,7 +20,7 @@ logging.basicConfig(
 
 def create_support_bundle(url, token, name, description, dic_config=None):
     """
-    This function creates a new Support bundle
+    Creates a new support bundle.
 
     Parameters
     ----------
@@ -52,7 +53,12 @@ def create_support_bundle(url, token, name, description, dic_config=None):
 
     """
     if dic_config is None:
-        dic_config = {}
+        yesterday = datetime.today() - timedelta(1)
+        yesterday = yesterday.strftime("%Y-%m-%d")
+        today = datetime.today()
+        today = today.strftime("%Y-%m-%d")
+        dic_config = {"parameters": {
+            "logs": {"start_date": yesterday, "end_date": today}}}
     data = {**dic_config}
     data["name"] = name
     data["description"] = description
@@ -76,7 +82,7 @@ def create_support_bundle(url, token, name, description, dic_config=None):
 
 def get_support_bundle(url, token, bundle_id):
     """
-    This function downloads a support bundle
+    Downloads a previously created bundle currently stored in the system.
 
     Parameters
     ----------
@@ -110,7 +116,7 @@ def get_support_bundle(url, token, bundle_id):
 
 def list_support_bundles(url, token):
     """
-    This function lists all support bundles
+    Lists previously created bundle currently stored in the system.
 
     Parameters
     ----------
@@ -134,10 +140,43 @@ def list_support_bundles(url, token):
     if response.ok:
         bundleinfo = response.json()
         bundles = bundleinfo['bundles']
+        print()
         print(tabulate(bundles, headers="keys"))
+        print()
         bundles = response.text
     else:
         logging.error(utilities.__get_msg(response, 'errors')  # pylint: disable=W0212:protected-access
                       )
         bundles = ''
     return bundles
+
+
+def delete_support_bundles(url, token, bundle_id=None, date=None):
+    """
+    Deletes a previously created bundle from the system.
+
+    Parameters
+    ----------
+    arg1 : str
+        base URL of JFrog Platform
+    arg2 : str
+        access or identity token of admin account
+    arg3 : int
+        id of bundle to be deleted
+    arg4 : date
+        bundles older than this date will be deleted
+
+    """
+    if isinstance(bundle_id, int):
+        bundle_id = str(bundle_id)
+    HEADERS.update({"Authorization": "Bearer " + token})
+    url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+        url)
+    urltopost = url + f"/artifactory/api/system/support/bundle/{bundle_id}"
+    logging.info('Deleting Support Bundle %s', bundle_id)
+    response = requests.delete(urltopost, headers=HEADERS, timeout=30)
+    if response.ok:
+        logging.info('Successfully deleted Support Bundle %s', bundle_id)
+    else:
+        logging.error(utilities.__get_msg(response, 'errors')  # pylint: disable=W0212:protected-access
+                      )
