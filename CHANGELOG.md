@@ -1,5 +1,20 @@
 # Changelog
 
+## v1.2.1
+
+### Added
+- Added function to create support bundle
+- Added function to download support bundle
+
+
+## v1.1.1
+
+### Added
+- Added function to create local repo
+
+### Updated
+- Bug fixes
+
 ## v1.0.0
 
 ### Added
