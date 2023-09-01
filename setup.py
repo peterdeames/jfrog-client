@@ -28,6 +28,7 @@ setuptools.setup(
         'requests',
         'tabulate',
         'logging',
-        'packaging'
+        'packaging',
+        'tqdm'
     ]
 )
