@@ -143,7 +143,7 @@ def list_support_bundles(url, token):
         print()
         print(tabulate(bundles, headers="keys"))
         print()
-        bundles = response.text
+        bundles = bundleinfo
     else:
         logging.error(utilities.__get_msg(response, 'errors')  # pylint: disable=W0212:protected-access
                       )
@@ -167,16 +167,25 @@ def delete_support_bundles(url, token, bundle_id=None, date=None):
         bundles older than this date will be deleted
 
     """
-    if isinstance(bundle_id, int):
-        bundle_id = str(bundle_id)
-    HEADERS.update({"Authorization": "Bearer " + token})
-    url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
-        url)
-    urltopost = url + f"/artifactory/api/system/support/bundle/{bundle_id}"
-    logging.info('Deleting Support Bundle %s', bundle_id)
-    response = requests.delete(urltopost, headers=HEADERS, timeout=30)
-    if response.ok:
-        logging.info('Successfully deleted Support Bundle %s', bundle_id)
+    if date is not None and bundle_id is None:
+        date = date.strftime("%Y-%m-%d")
+        bundleinfo = list_support_bundles(url, token)
+        bundles = bundleinfo['bundles']
+        # print(bundles)
+        for bundle in bundles:
+            if bundle['created'] < date:
+                delete_support_bundles(url, token, bundle['id'])
     else:
-        logging.error(utilities.__get_msg(response, 'errors')  # pylint: disable=W0212:protected-access
-                      )
+        if isinstance(bundle_id, int):
+            bundle_id = str(bundle_id)
+        HEADERS.update({"Authorization": "Bearer " + token})
+        url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
+            url)
+        urltopost = url + f"/artifactory/api/system/support/bundle/{bundle_id}"
+        logging.info('Deleting Support Bundle %s', bundle_id)
+        response = requests.delete(urltopost, headers=HEADERS, timeout=30)
+        if response.ok:
+            logging.info('Successfully deleted Support Bundle %s', bundle_id)
+        else:
+            logging.error(utilities.__get_msg(response, 'errors')  # pylint: disable=W0212:protected-access
+                          )
