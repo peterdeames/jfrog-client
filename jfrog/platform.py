@@ -2,8 +2,10 @@
 
 import logging
 from datetime import datetime
+
 import requests
 from tabulate import tabulate
+
 from jfrog import artifactory, utilities
 
 HEADERS = {'content-type': 'application/json'}

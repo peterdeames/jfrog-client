@@ -9,7 +9,7 @@ with open('README.md', 'r', encoding='utf-8') as fh:
 
 setuptools.setup(
     name='jfrog-client',
-    version='1.1.1',
+    version='1.2.1',
     description='Package that creates simple APIs to interact with Jfrog',
     packages=setuptools.find_packages(),
     url='https://github.com/peterdeames/jfrog-client',
@@ -28,6 +28,7 @@ setuptools.setup(
         'requests',
         'tabulate',
         'logging',
-        'packaging'
+        'packaging',
+        'tqdm'
     ]
 )
