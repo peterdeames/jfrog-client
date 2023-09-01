@@ -297,7 +297,11 @@ def create_local_repo(url, token, dict_name, dict_data=None):
         tech - refers to the type of tool or package\n
         maturity - refers to the package maturity level,
         such as the development, staging and release\n
-        locator - refers to the physical topology of your artifacts\n
+        locator - refers to the physical topology of your artifacts
+    arg4: dict
+        dictionary of repository configurations\n
+        Refer to https://jfrog.com/help/r/jfrog-rest-apis/repository-configuration-json
+        for valid configurations
 
     """
     team = None
