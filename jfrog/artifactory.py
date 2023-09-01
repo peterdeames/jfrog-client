@@ -278,7 +278,7 @@ def rename_repo(url, token, old_repo_name, new_repo_name, ptype, action='copy', 
                       )
 
 
-def create_local_repo(url, token, dic_name):
+def create_local_repo(url, token, dict_name, dict_data=None):
     """
     This function will create a local repository with default values\n
     Refers to the
@@ -304,15 +304,15 @@ def create_local_repo(url, token, dic_name):
     tech = None
     maturity = None
     locator = None
-    for key in dic_name:
+    for key in dict_name:
         if key == 'team':
-            team = dic_name[key]
+            team = dict_name[key]
         if key == 'tech':
-            tech = dic_name[key]
+            tech = dict_name[key]
         if key == 'maturity':
-            maturity = dic_name[key]
+            maturity = dict_name[key]
         if key == 'locator':
-            locator = dic_name[key]
+            locator = dict_name[key]
     HEADERS.update({"Authorization": "Bearer " + token})
     url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
         url)
@@ -324,7 +324,7 @@ def create_local_repo(url, token, dic_name):
         tech)
     logging.debug(layout)
     data = utilities.__set_repo_data(  # pylint: disable=W0212:protected-access
-        name, layout, tech, 'local')
+        name, layout, tech, 'local', dict_data)
     logging.debug(data)
     try:
         response = requests.put(urltopost, headers=HEADERS,

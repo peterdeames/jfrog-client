@@ -72,14 +72,17 @@ def __validate_url(url):
     return url
 
 
-def __set_repo_data(name, layout, ptype, rtype):
+def __set_repo_data(name, layout, ptype, rtype, dict_data=None):
     """ This function sets the data to be sent for the creation of a repo """
-    data = {}
+    if dict_data is None:
+        dict_data = {}
+    data = {**dict_data}
     data["key"] = name
     data["rclass"] = rtype
     data["packageType"] = ptype
     data["xrayIndex"] = 'true'
     data["repoLayoutRef"] = layout
+    print(data)
     data = json.dumps(data)
     return data
 
