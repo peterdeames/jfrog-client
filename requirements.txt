@@ -1,13 +1,9 @@
-setuptools
+setuptools>=65.5.1 # pinned by Snyk to avoid a vulnerability
 build
-wheel
-sphinx
-twine
+wheel>=0.38.0 # pinned by Snyk to avoid a vulnerability
 requests
 pylint
 bandit
-nose
-nose2
-coverage
 tabulate
 packaging
+tqdm
