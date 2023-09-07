@@ -164,7 +164,7 @@ def get_repo_count(url, token, repository_type):
     HEADERS.update({"Authorization": "Bearer " + token})
     url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
         url)
-    urltopost = url + f'/artifactory/api/repositories?type = {repository_type}'
+    urltopost = url + f'/artifactory/api/repositories?type={repository_type}'
     response = requests.get(urltopost, headers=HEADERS, timeout=30)
     if response.ok:
         repos = response.json()
@@ -197,7 +197,7 @@ def get_storage_info(url, token):
     url = utilities.__validate_url(  # pylint: disable=W0212:protected-access
         url)
     urltopost = url + '/artifactory/api/storageinfo'
-    response = requests.get(urltopost, headers=HEADERS, timeout=30)
+    response = requests.get(urltopost, headers=HEADERS, timeout=60)
     if response.ok:
         storageinfo = response.json()
         storageinfo = storageinfo['binariesSummary']

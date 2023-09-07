@@ -1,5 +1,18 @@
 # Changelog
 
+## v1.2.3
+
+### Updated
+- Fixed bug on count of repos
+- Increased timeout on get storage details to 60 seconds
+
+
+## v1.2.2
+
+### Updated
+- Split support functions into seperate file
+
+
 ## v1.2.1
 
 ### Added

@@ -463,17 +463,17 @@ def check_artifacts(source_url, source_token, target_url, target_token):
     logging.info("Recalculating storage on %s and %s",
                  source_url, target_url)
     logging.info("This may take up to 2 mins..")
-    # requests.post(source_url + '/artifactory/api/storageinfo/calculate',
-    #              headers=SOURCE_HEADER, timeout=30)
-    # requests.post(target_url + '/artifactory/api/storageinfo/calculate',
-    #              headers=TARGET_HEADER, timeout=30)
+    requests.post(source_url + '/artifactory/api/storageinfo/calculate',
+                  headers=SOURCE_HEADER, timeout=30)
+    requests.post(target_url + '/artifactory/api/storageinfo/calculate',
+                  headers=TARGET_HEADER, timeout=30)
     utilities.__progressbar(100)  # pylint: disable=W0212:protected-access
     logging.info("Comparing artifacts from %s to %s",
                  source_url, target_url)
     source_response = requests.get(source_url + '/artifactory/api/storageinfo',
-                                   headers=SOURCE_HEADER, timeout=30)
+                                   headers=SOURCE_HEADER, timeout=60)
     target_response = requests.get(target_url + '/artifactory/api/storageinfo',
-                                   headers=TARGET_HEADER, timeout=30)
+                                   headers=TARGET_HEADER, timeout=60)
     table = []
     t_headers = ['Repo', 'Repo Type', 'Source Count', 'Target Count']
     for sresult in literal_eval(source_response.text)["repositoriesSummaryList"]:
@@ -481,7 +481,8 @@ def check_artifacts(source_url, source_token, target_url, target_token):
         repo = sresult.get('repoKey')
         rtype = sresult.get('repoType')
         source_count = sresult.get('filesCount')
-        if rtype != 'REMOTE' and rtype != 'NA' and repo != 'jfrog-usage-logs':
+        if (rtype != 'REMOTE' and rtype != 'NA' and
+                repo != 'jfrog-usage-logs' and repo != 'artifactory-build-info'):
             repo_lst.append(repo)
             repo_lst.append(rtype)
             repo_lst.append(source_count)
